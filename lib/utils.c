@@ -59,6 +59,13 @@ int fact(int n) {
     return prod;
 }
 
+/*
+ * 质因数分解
+ * @ n: 待分解的数
+ * @ prime_factors: 输入的用于返回的质因数数组
+ * @ len: 质数组长度
+ * @ nums: 输入的用于返回的质因数的数目
+ */
 void decompose_prime_factor(int n, int *prime_factors, const int len, int *nums) {
     int merchant = n;
     int num = 2;
@@ -73,4 +80,25 @@ void decompose_prime_factor(int n, int *prime_factors, const int len, int *nums)
             ++num;
     }
     *nums = index;
+}
+
+/*
+ * 二分搜索
+ */
+
+
+/*
+ * 线性搜索
+ */
+int linear_search(void *arr, size_t len, size_t elem_size, void *key, void *elem_key(void *)) {
+    void *cur_key = NULL;
+    void *cur_p;
+    int index = -1;
+    for (cur_p = arr; cur_p - arr != len; cur_p += elem_size) {
+        cur_key = elem_key(cur_p);
+        ++index;
+        if (!memcmp(cur_key, key, elem_size))
+            return index;
+    }
+    return -1;
 }
