@@ -15,6 +15,8 @@ typedef struct _bt_node {
 
 BTREE create_bt(char *sentence, int sentence_len);
 
+BTREE create_bt_node();
+
 void level_print_bt(BTREE T);
 
 int count_bt_leaf_recur(BTREE T);
@@ -44,12 +46,14 @@ void post_order_recur(BTREE T, void visit(int argc, ...));
 
 void post_order(BTREE T, void visit(int, ...));
 
+void post_order2(BTREE T, void visit(int, ...));
+
+// 前中序列恢复二叉树
+void recover_bt_by_pre_in(BTREE *T, char *pre_seq, size_t pre_len, char *in_seq, size_t in_len);
+
 int count_bt_depth_recur(BTREE T);
 
 void print_bt_node(int argc, BTREE T);
 
-void post_order2(BTREE T, void visit(int, ...));
-
-//void PostOrder(BTREE bt);
 
 #endif //BASETEST_BINARY_TREE_H

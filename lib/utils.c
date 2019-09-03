@@ -87,6 +87,7 @@ void decompose_prime_factor(int n, int *prime_factors, const int len, int *nums)
  */
 
 
+
 /*
  * 线性搜索
  * arr是基本类型数组

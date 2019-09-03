@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include <binary_tree.h>
 #include <queue.h>
@@ -52,6 +53,16 @@ BTREE create_bt(char *sentence, int sentence_len) {
         --sentence_len;
     }
     return NULL;
+}
+
+BTREE create_bt_node() {
+    BTREE p = (BTREE) malloc(sizeof(BTNode));
+    if (p != NULL) {
+        p->data = 0;
+        p->r_child = NULL;
+        p->r_child = NULL;
+    }
+    return p;
 }
 
 void level_print_bt(BTREE T) {
@@ -162,7 +173,7 @@ void in_order(BTREE T, void visit(int, ...)) {
 void in_order2(BTREE T, void visit(int, ...)) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     BTREE p = T;
-    while(!(p == NULL && stack_is_empty(stack))) {
+    while (!(p == NULL && stack_is_empty(stack))) {
         if (p != NULL) {
             push_stack(stack, &p);
             p = p->l_child;
@@ -191,8 +202,7 @@ void in_order3(BTREE T, void visit(int, ...)) {
         pop_stack(flags, &flag);
         if (flag) {
             visit(1, p);
-        }
-        else {
+        } else {
             if (p->r_child != NULL) {
                 push_stack(stack, &(p->r_child));
                 push_stack(flags, &FALSE);
@@ -241,8 +251,7 @@ void post_order(BTREE T, void visit(int, ...)) {
             visit(1, p);
             // p == NULL 表明以这个结点为根的树处理完毕，不需要在下一次迭代时处理了
             p = NULL;
-        }
-        else {
+        } else {
             push_stack(stack, &p);
             push_stack(flags, &TRUE);
             p = p->r_child;
@@ -280,3 +289,55 @@ void print_bt_node(int argc, BTREE T) {
     printf("%c ", T->data);
 }
 
+void recover_bt_by_pre_in(BTREE *T, char *pre_seq, size_t pre_len, char *in_seq, size_t in_len) {
+    if (pre_len == 0) {
+        *T = NULL;
+        return;
+    }
+    *T = create_bt_node();
+    (*T)->data = *pre_seq;
+    char *in_root = (char *) memchr(in_seq, (*T)->data, sizeof(char) * in_len);
+
+    char *in_left_sub_seq;
+    size_t in_left_sub_seq_len;
+    if (in_root == in_seq) {
+        in_left_sub_seq = NULL;
+        in_left_sub_seq_len = 0;
+    } else {
+        in_left_sub_seq = in_seq;
+        in_left_sub_seq_len = in_root - in_seq;
+    }
+
+    char *in_right_sub_seq;
+    size_t in_right_sub_seq_len;
+    if (in_root == (in_seq + in_len - 1)) {
+        in_right_sub_seq = NULL;
+        in_right_sub_seq_len = 0;
+    } else {
+        in_right_sub_seq = in_root + 1;
+        in_right_sub_seq_len = (in_seq + in_len - 1) - in_root;
+    }
+
+    char *pre_left_sub_seq;
+    size_t pre_left_sub_seq_len = in_left_sub_seq_len;
+    if (pre_left_sub_seq_len == 0) {
+        pre_left_sub_seq = NULL;
+        (*T)->l_child = NULL;
+    } else {
+        pre_left_sub_seq = pre_seq + 1;
+        BTREE left = create_bt_node();
+        left->data = *pre_left_sub_seq;
+        (*T)->l_child = left;
+    }
+
+    char *pre_right_sub_seq;
+    size_t pre_right_sub_seq_len = in_right_sub_seq_len;
+    if (pre_right_sub_seq_len == 0) {
+        pre_right_sub_seq = NULL;
+    } else {
+        pre_right_sub_seq = pre_left_sub_seq + pre_left_sub_seq_len;
+    }
+
+
+
+}
