@@ -20,7 +20,7 @@ void decompose_prime_factor(int n, int *prime_factors, int len, int *nums);
 
 int binary_search_recur(void *arr, size_t len, size_t elem_size, int left, int right, void *key(void *));
 
-int linear_search(void *arr, size_t len, size_t elem_size, void *key, void *elem_key(void *));
+int linear_search(void *arr, size_t len, size_t elem_size, void *key);
 
 
 #endif //BASETEST_UTILS_H

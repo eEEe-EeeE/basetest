@@ -89,16 +89,16 @@ void decompose_prime_factor(int n, int *prime_factors, const int len, int *nums)
 
 /*
  * 线性搜索
+ * arr是基本类型数组
  */
-int linear_search(void *arr, size_t len, size_t elem_size, void *key, void *elem_key(void *)) {
-    void *cur_key = NULL;
+int linear_search(void *arr, size_t len, size_t elem_size, void *key) {
     void *cur_p;
     int index = -1;
     for (cur_p = arr; cur_p - arr != len; cur_p += elem_size) {
-        cur_key = elem_key(cur_p);
         ++index;
-        if (!memcmp(cur_key, key, elem_size))
+        if (!memcmp(cur_p, key, elem_size))
             return index;
     }
     return -1;
 }
+

@@ -14,10 +14,9 @@ int main() {
     int sentence_len = sizeof(sentence) / sizeof(char);
     BTREE T = create_bt(sentence, sentence_len);
 
-    int x = 1;
-    int y = 3;
-    int res = memcmp(&x, &y, sizeof(int));
-    printf("%d", res);
+    int a[] = {3, 4, 2, 8, 5, 0, 1};
+    int x = 0;
+    printf("%d", linear_search(a, sizeof(a), sizeof(int), &x));
 
     return 0;
 }
