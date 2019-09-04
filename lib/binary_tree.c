@@ -113,10 +113,11 @@ void pre_order(BTREE T, void visit(int, ...)) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     BTREE p = T;
     while (!(p == NULL && stack_is_empty(stack))) {
-        while (p != NULL) {
+        if (p != NULL) {
             visit(1, p);
             push_stack(stack, &p);
             p = p->l_child;
+            continue;
         }
         pop_stack(stack, &p);
         p = p->r_child;
@@ -289,55 +290,72 @@ void print_bt_node(int argc, BTREE T) {
     printf("%c ", T->data);
 }
 
-void recover_bt_by_pre_in(BTREE *T, char *pre_seq, size_t pre_len, char *in_seq, size_t in_len) {
-    if (pre_len == 0) {
-        *T = NULL;
-        return;
-    }
-    *T = create_bt_node();
-    (*T)->data = *pre_seq;
-    char *in_root = (char *) memchr(in_seq, (*T)->data, sizeof(char) * in_len);
-
-    char *in_left_sub_seq;
-    size_t in_left_sub_seq_len;
-    if (in_root == in_seq) {
-        in_left_sub_seq = NULL;
-        in_left_sub_seq_len = 0;
-    } else {
-        in_left_sub_seq = in_seq;
-        in_left_sub_seq_len = in_root - in_seq;
+BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t seq_len) {
+    if (seq_len == 0) {
+        return NULL;
     }
 
-    char *in_right_sub_seq;
-    size_t in_right_sub_seq_len;
-    if (in_root == (in_seq + in_len - 1)) {
-        in_right_sub_seq = NULL;
-        in_right_sub_seq_len = 0;
-    } else {
-        in_right_sub_seq = in_root + 1;
-        in_right_sub_seq_len = (in_seq + in_len - 1) - in_root;
+    BTREE T = create_bt_node();
+    T->data = *pre_seq;
+    char *in_root = (char *) memchr(in_seq, T->data, sizeof(char) * seq_len);
+
+    T->l_child = recover_bt_by_pre_in_recur(pre_seq + 1, in_seq,
+                                            in_root - in_seq);
+
+    T->r_child = recover_bt_by_pre_in_recur(pre_seq + 1 + (in_root - in_seq), in_root + 1,
+                                            (in_seq + seq_len - 1) - in_root);
+
+    return T;
+}
+
+BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t seq_len) {
+    STACK *stack_b = init_stack(sizeof(BTREE), 10);
+    STACK *stack_pre = init_stack(sizeof(char *), 10);
+    STACK *stack_in = init_stack(sizeof(char *), 10);
+    STACK *stack_root = init_stack(sizeof(char *), 10);
+    STACK *stack_u = init_stack(sizeof(size_t), 10);
+    // 0表示左，1表示右
+    STACK *stack_f = init_stack(sizeof(_Bool), 10);
+    BTREE T;
+    BTREE cur_T;
+
+    char *in_root;
+    const char *p_seq = pre_seq;
+    const char *i_seq = in_seq;
+    size_t s_len = seq_len;
+    char *temp1;
+    size_t temp2;
+
+    _Bool flag;
+    _Bool FALSE = false;
+    _Bool TRUE = true;
+    while (!(s_len == 0 && stack_is_empty(stack_u))) {
+        if (s_len != 0) {
+            T = create_bt_node();
+            T->data = *p_seq;
+            in_root = (char *) memchr(i_seq, T->data, sizeof(char) * s_len);
+            push_stack(stack_b, &T);
+            push_stack(stack_pre, &p_seq);
+            push_stack(stack_in, &i_seq);
+            push_stack(stack_root, &in_root);
+            push_stack(stack_u, &s_len);
+            push_stack(stack_f, &FALSE);
+            p_seq = p_seq + 1;
+            s_len = in_root - i_seq;
+            continue;
+        } else {
+            cur_T = NULL;
+        }
+        pop_stack(stack_b, &T);
+        pop_stack(stack_pre, &p_seq);
+        pop_stack(stack_in, &i_seq);
+        pop_stack(stack_root, &in_root);
+        pop_stack(stack_u, &s_len);
+        pop_stack(stack_f, &flag);
+        p_seq = p_seq + 1 + (in_root - i_seq);
+        i_seq = in_root + 1;
+        s_len = (i_seq + s_len - 1) - in_root;
+
     }
-
-    char *pre_left_sub_seq;
-    size_t pre_left_sub_seq_len = in_left_sub_seq_len;
-    if (pre_left_sub_seq_len == 0) {
-        pre_left_sub_seq = NULL;
-        (*T)->l_child = NULL;
-    } else {
-        pre_left_sub_seq = pre_seq + 1;
-        BTREE left = create_bt_node();
-        left->data = *pre_left_sub_seq;
-        (*T)->l_child = left;
-    }
-
-    char *pre_right_sub_seq;
-    size_t pre_right_sub_seq_len = in_right_sub_seq_len;
-    if (pre_right_sub_seq_len == 0) {
-        pre_right_sub_seq = NULL;
-    } else {
-        pre_right_sub_seq = pre_left_sub_seq + pre_left_sub_seq_len;
-    }
-
-
-
+    return NULL;
 }

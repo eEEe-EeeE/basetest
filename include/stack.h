@@ -26,5 +26,7 @@ void push_stack(STACK *stack, void *data);
 
 void pop_stack(STACK *stack, void *data);
 
+void _resize(STACK *stack, size_t max_len);
+
 
 #endif //BASETEST_STACK_H

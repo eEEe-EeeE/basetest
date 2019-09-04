@@ -49,7 +49,9 @@ void post_order(BTREE T, void visit(int, ...));
 void post_order2(BTREE T, void visit(int, ...));
 
 // 前中序列恢复二叉树
-void recover_bt_by_pre_in(BTREE *T, char *pre_seq, size_t pre_len, char *in_seq, size_t in_len);
+BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t seq_len);
+
+BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, size_t seq_len);
 
 int count_bt_depth_recur(BTREE T);
 
