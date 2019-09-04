@@ -352,9 +352,17 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
         pop_stack(stack_root, &in_root);
         pop_stack(stack_u, &s_len);
         pop_stack(stack_f, &flag);
-        p_seq = p_seq + 1 + (in_root - i_seq);
-        i_seq = in_root + 1;
-        s_len = (i_seq + s_len - 1) - in_root;
+        if (flag == false) {
+            p_seq = p_seq + 1 + (in_root - i_seq);
+            i_seq = in_root + 1;
+            s_len = (i_seq + s_len - 1) - in_root;
+            T->l_child = cur_T;
+        }
+        else {
+            T->r_child = cur_T;
+            cur_T = T;
+        }
+
 
     }
     return NULL;
