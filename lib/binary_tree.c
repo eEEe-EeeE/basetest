@@ -308,6 +308,10 @@ BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t
     return T;
 }
 
+// 转非递归的要素：1.是否满足递归终止条件  2.进递归前做了哪些事情  3.出递归做了哪些事情
+// 分两方面 1.问题还未解决，问题已经解决
+// 问题还未解决包括 1.递归前做了哪些事情并进入递归
+// 有返回值时问题已经解决包括 1.达到终止条件出递归 2.未达到终止条件出递归 回退到先祖函数不同的点，做不同的事情
 BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t seq_len) {
     STACK *stack_b = init_stack(sizeof(BTREE), 20);
     STACK *stack_pre = init_stack(sizeof(char *), 20);
@@ -329,10 +333,13 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
     _Bool flag = false;
     _Bool FALSE = false;
     _Bool TRUE = true;
-    // s_len == 0表示当前子问题已经解决
-    // stack_u is empty表示当前子问题的先祖问题已经解决
+    // s_len是否为零表示当前子问题是否已经解决
+    // stack_u是否为空表示当前子问题的先祖问题是否已经解决
     while (!(s_len == 0 && stack_is_empty(stack_u))) {
+        // len == 0 && flag == 0表示问题已解决且问题规模为零
+        // len == 0 && flag == 1表示问题已解决且问题规模不为零
         if (s_len != 0) {
+            // 此时处于一个非空节点上，问题的规模不为零，前序序列和中序序列不为零，可建立结点
             T = create_bt_node();
             T->data = *p_seq;
             in_root = (char *) memchr(i_seq, T->data, sizeof(char) * s_len);
@@ -344,36 +351,42 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
             push_stack(stack_f, &FALSE);
             p_seq = p_seq + 1;
             s_len = in_root - i_seq;
+            // 此时进入子函数
             continue;
-        }
-        else if (flag == false) {
-            return_value = NULL;
-            push_stack(stack_return, &return_value);
-        }
-        pop_stack(stack_b, &T);
-        pop_stack(stack_pre, &p_seq);
-        pop_stack(stack_in, &i_seq);
-        pop_stack(stack_root, &in_root);
-        pop_stack(stack_u, &s_len);
-        pop_stack(stack_f, &flag);
-        pop_stack(stack_return, &return_value);
-        if (flag == false) {
-            T->l_child = return_value;
-            push_stack(stack_b, &T);
-            push_stack(stack_pre, &p_seq);
-            push_stack(stack_in, &i_seq);
-            push_stack(stack_root, &in_root);
-            push_stack(stack_u, &s_len);
-            push_stack(stack_f, &TRUE);
-            p_seq = p_seq + 1 + (in_root - i_seq);
-            temp_i_seq = i_seq;
-            i_seq = in_root + 1;
-            s_len = (temp_i_seq + s_len - 1) - in_root;
         } else {
-            T->r_child = return_value;
-            return_value = T;
-            push_stack(stack_return, &return_value);
-            s_len = 0;
+            // 此时处于一个空结点上，前序序列和中序序列不存在
+            if (flag == false) {
+                return_value = NULL;
+                push_stack(stack_return, &return_value);
+            }
+            pop_stack(stack_b, &T);
+            pop_stack(stack_pre, &p_seq);
+            pop_stack(stack_in, &i_seq);
+            pop_stack(stack_root, &in_root);
+            pop_stack(stack_u, &s_len);
+            pop_stack(stack_f, &flag);
+            pop_stack(stack_return, &return_value);
+            // 此时回退到父函数
+            if (flag == false) {
+                T->l_child = return_value;
+                push_stack(stack_b, &T);
+                push_stack(stack_pre, &p_seq);
+                push_stack(stack_in, &i_seq);
+                push_stack(stack_root, &in_root);
+                push_stack(stack_u, &s_len);
+                push_stack(stack_f, &TRUE);
+                p_seq = p_seq + 1 + (in_root - i_seq);
+                temp_i_seq = i_seq;
+                i_seq = in_root + 1;
+                s_len = (temp_i_seq + s_len - 1) - in_root;
+                // 此时进入子函数
+            } else {
+                // 进入这里表示问题已解决且规模不为零
+                T->r_child = return_value;
+                return_value = T;
+                push_stack(stack_return, &return_value);
+                s_len = 0;
+            }
         }
     }
     pop_stack(stack_return, &return_value);
