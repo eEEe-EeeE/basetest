@@ -16,7 +16,7 @@ int main() {
 
     char pre[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};
     char in[] = {'B', 'C', 'A', 'E', 'D', 'G', 'H', 'F', 'I'};
-    BTREE p = recover_bt_by_pre_in_recur(pre, in, 9);
+    BTREE p = recover_bt_by_pre_in(pre, in, 9);
     pre_order_recur(p, (void (*)(int, ...)) print_bt_node);
     printf("\n");
     pre_order(p, (void (*)(int, ...)) print_bt_node);

@@ -309,26 +309,28 @@ BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t
 }
 
 BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t seq_len) {
-    STACK *stack_b = init_stack(sizeof(BTREE), 10);
-    STACK *stack_pre = init_stack(sizeof(char *), 10);
-    STACK *stack_in = init_stack(sizeof(char *), 10);
-    STACK *stack_root = init_stack(sizeof(char *), 10);
-    STACK *stack_u = init_stack(sizeof(size_t), 10);
+    STACK *stack_b = init_stack(sizeof(BTREE), 20);
+    STACK *stack_pre = init_stack(sizeof(char *), 20);
+    STACK *stack_in = init_stack(sizeof(char *), 20);
+    STACK *stack_root = init_stack(sizeof(char *), 20);
+    STACK *stack_u = init_stack(sizeof(size_t), 20);
     // 0表示左，1表示右
-    STACK *stack_f = init_stack(sizeof(_Bool), 10);
+    STACK *stack_f = init_stack(sizeof(_Bool), 20);
+    STACK *stack_return = init_stack(sizeof(BTREE), 20);
     BTREE T;
-    BTREE cur_T;
 
     char *in_root;
     const char *p_seq = pre_seq;
     const char *i_seq = in_seq;
+    const char *temp_i_seq;
     size_t s_len = seq_len;
-    char *temp1;
-    size_t temp2;
+    BTREE return_value;
 
-    _Bool flag;
+    _Bool flag = false;
     _Bool FALSE = false;
     _Bool TRUE = true;
+    // s_len == 0表示当前子问题已经解决
+    // stack_u is empty表示当前子问题的先祖问题已经解决
     while (!(s_len == 0 && stack_is_empty(stack_u))) {
         if (s_len != 0) {
             T = create_bt_node();
@@ -343,8 +345,10 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
             p_seq = p_seq + 1;
             s_len = in_root - i_seq;
             continue;
-        } else {
-            cur_T = NULL;
+        }
+        else if (flag == false) {
+            return_value = NULL;
+            push_stack(stack_return, &return_value);
         }
         pop_stack(stack_b, &T);
         pop_stack(stack_pre, &p_seq);
@@ -352,18 +356,26 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
         pop_stack(stack_root, &in_root);
         pop_stack(stack_u, &s_len);
         pop_stack(stack_f, &flag);
+        pop_stack(stack_return, &return_value);
         if (flag == false) {
+            T->l_child = return_value;
+            push_stack(stack_b, &T);
+            push_stack(stack_pre, &p_seq);
+            push_stack(stack_in, &i_seq);
+            push_stack(stack_root, &in_root);
+            push_stack(stack_u, &s_len);
+            push_stack(stack_f, &TRUE);
             p_seq = p_seq + 1 + (in_root - i_seq);
+            temp_i_seq = i_seq;
             i_seq = in_root + 1;
-            s_len = (i_seq + s_len - 1) - in_root;
-            T->l_child = cur_T;
+            s_len = (temp_i_seq + s_len - 1) - in_root;
+        } else {
+            T->r_child = return_value;
+            return_value = T;
+            push_stack(stack_return, &return_value);
+            s_len = 0;
         }
-        else {
-            T->r_child = cur_T;
-            cur_T = T;
-        }
-
-
     }
-    return NULL;
+    pop_stack(stack_return, &return_value);
+    return return_value;
 }
