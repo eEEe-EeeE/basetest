@@ -7,10 +7,13 @@
 
 #include <stddef.h>
 
-typedef struct stack_elem {
-    void *data_arr;
-    int top;
+typedef struct _stack_elem {
+    void *_data_arr;
+    size_t size;
+    // 以elem_size为单位
+    int _top;
     size_t elem_size;
+    // 以elem_size为单位
     size_t max_len;
 } STACK;
 
@@ -24,9 +27,9 @@ _Bool stack_is_full(STACK *stack);
 
 void push_stack(STACK *stack, void *data);
 
-void pop_stack(STACK *stack, void *data);
+int pop_stack(STACK *stack, void *data);
 
-void _resize(STACK *stack, size_t max_len);
+int _resize_stack(STACK *stack, size_t max_len);
 
 
 #endif //BASETEST_STACK_H

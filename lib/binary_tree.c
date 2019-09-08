@@ -65,19 +65,79 @@ BTREE create_bt_node() {
     return p;
 }
 
-void level_print_bt(BTREE T) {
-    QUEUE *q = init_queue(20);
-    BTREE p;
-    push_queue(q, &T);
-    while (!queue_is_empty(q)) {
-        pop_queue(q, &p);
-        if (p->l_child != NULL)
-            push_queue(q, &p->l_child);
-        if (p->r_child != NULL)
-            push_queue(q, &p->r_child);
-        printf("%c ", p->data);
+void build_bt(BTREE *T) {
+    char ch;
+    scanf("%c", &ch);
+    if (ch == ' ') {
+        (*T) = NULL;
+    } else {
+        (*T) = (BTREE) malloc(sizeof(BTNode));
+        (*T)->data = ch;
+        build_bt(&((*T)->l_child));
+        build_bt(&((*T)->r_child));
     }
-    del_queue(q);
+}
+
+// 销毁树的时候，后序遍历最合适
+void destroy_bt(BTREE T) {
+    if (T != NULL) {
+        destroy_bt(T->l_child);
+        destroy_bt(T->r_child);
+        free(T);
+    }
+}
+
+void clear_bt(BTREE *T) {
+    destroy_bt(*T);
+    (*T) = NULL;
+}
+
+BTREE delete_bt(BTREE *T, char item) {
+    STACK *stack = init_stack(sizeof(BTREE), 20);
+    BTREE p = *T;
+    BTREE q = NULL;
+    if ((*T)->data == item) {
+        clear_bt(T);
+        return NULL;
+    } else {
+        while (!(p == NULL && stack_is_empty(stack))) {
+            if (p != NULL) {
+                if (p->data == item) {
+                    if (q->l_child == p)
+                        q->l_child = NULL;
+                    else if (q->r_child == p)
+                        q->r_child = NULL;
+                    clear_bt(&p);
+                    return *T;
+                }
+                push_stack(stack, &p);
+                q = p;
+                p = p->l_child;
+            } else {
+                pop_stack(stack, &p);
+                q = p;
+                p = p->r_child;
+            }
+        }
+    }
+    return *T;
+}
+
+void level_print_bt(BTREE T) {
+    if (T != NULL) {
+        QUEUE *q = init_queue(sizeof(BTREE), 20);
+        BTREE p;
+        push_queue(q, &T);
+        while (!queue_is_empty(q)) {
+            pop_queue(q, &p);
+            if (p->l_child != NULL)
+                push_queue(q, &p->l_child);
+            if (p->r_child != NULL)
+                push_queue(q, &p->r_child);
+            printf("%c ", p->data);
+        }
+        del_queue(q);
+    }
 }
 
 int count_bt_leaf_recur(BTREE T) {
@@ -92,10 +152,171 @@ int count_bt_depth_recur(BTREE T) {
     if (T == NULL)
         return 0;
     else {
-        int left_d = count_bt_depth_recur(T->l_child);
-        int right_d = count_bt_depth_recur(T->r_child);
-        return left_d > right_d ? left_d + 1 : right_d + 1;
+        int left_depth = count_bt_depth_recur(T->l_child);
+        int right_depth = count_bt_depth_recur(T->r_child);
+        if (left_depth > right_depth)
+            return left_depth + 1;
+        else
+            return right_depth + 1;
     }
+}
+
+int bt_node_is_leaf(BTREE node) {
+    if (node == NULL)
+        return 0;
+    else
+        return node->l_child == NULL && node->r_child == NULL;
+}
+
+int count_bt_depth_pre(BTREE T) {
+    if (T == NULL)
+        return 0;
+    STACK *stack = init_stack(sizeof(BTREE), 20);
+    STACK *level = init_stack(sizeof(int), 20);
+    BTREE p = T;
+    int cur_level = 0;
+    int cur_max_level = 1;
+    while (!(p == NULL && stack_is_empty(stack))) {
+        if (p != NULL) {
+            ++cur_level;
+            if (bt_node_is_leaf(p) && cur_level > cur_max_level)
+                cur_max_level = cur_level;
+            push_stack(stack, &p);
+            push_stack(level, &cur_level);
+            p = p->l_child;
+            continue;
+        } else {
+            pop_stack(stack, &p);
+            pop_stack(level, &cur_level);
+            p = p->r_child;
+        }
+    }
+    del_stack(stack);
+    del_stack(level);
+    return cur_max_level;
+}
+
+int count_bt_depth_in(BTREE T) {
+    if (T == NULL)
+        return 0;
+    STACK *stack = init_stack(sizeof(BTREE), 20);
+    STACK *level = init_stack(sizeof(int), 20);
+    BTREE p = T;
+    int cur_level = 0;
+    int cur_max_level = 1;
+    while (!(p == NULL && stack_is_empty(stack))) {
+        if (p != NULL) {
+            ++cur_level;
+            push_stack(stack, &p);
+            push_stack(level, &cur_level);
+            p = p->l_child;
+            continue;
+        } else {
+            pop_stack(stack, &p);
+            pop_stack(level, &cur_level);
+            if (bt_node_is_leaf(p) && cur_level > cur_max_level)
+                cur_max_level = cur_level;
+            p = p->r_child;
+        }
+    }
+    del_stack(stack);
+    del_stack(level);
+    return cur_max_level;
+}
+
+int count_bt_depth_post(BTREE T) {
+    if (T == NULL)
+        return 0;
+    STACK *stack = init_stack(sizeof(BTREE), 10);
+    STACK *flags = init_stack(sizeof(_Bool), 10);
+    BTREE p = T;
+    _Bool flag = false;
+    _Bool TRUE = true;
+    _Bool FALSE = false;
+    int cur_max_level = 1;
+    while (!(p == NULL && stack_is_empty(stack))) {
+        if (p != NULL) {
+            push_stack(stack, &p);
+            push_stack(flags, &FALSE);
+            p = p->l_child;
+        } else {
+            pop_stack(stack, &p);
+            pop_stack(flags, &flag);
+            if (flag == false) {
+                push_stack(stack, &p);
+                push_stack(flags, &TRUE);
+                p = p->r_child;
+            } else {
+                if (stack->size + 1 > cur_max_level)
+                    cur_max_level = (int) stack->size + 1;
+                p = NULL;
+            }
+        }
+    }
+    del_stack(stack);
+    del_stack(flags);
+    return cur_max_level;
+}
+
+// 后序遍历访问某个结点时，该结点的所有先祖节点依次都在栈里，其他遍历方式不存在这种情况
+// 其他遍历方式也可以做
+int calc_bt_node_layer(BTREE T, char item) {
+    STACK *stack = init_stack(sizeof(BTREE), 20);
+    STACK *flags = init_stack(sizeof(_Bool), 20);
+    _Bool flag = false;
+    _Bool TRUE = true;
+    _Bool FALSE = false;
+    BTREE p = T;
+    while (!(p == NULL && stack_is_empty(stack))) {
+        if (p != NULL) {
+            push_stack(stack, &p);
+            push_stack(flags, &FALSE);
+            p = p->l_child;
+        } else {
+            pop_stack(stack, &p);
+            pop_stack(flags, &flag);
+            if (flag == false) {
+                push_stack(stack, &p);
+                push_stack(flags, &TRUE);
+                p = p->r_child;
+            } else {
+                if (p->data == item)
+                    return (int) stack->size + 1;
+                p = NULL;
+            }
+        }
+    }
+    del_stack(stack);
+    del_stack(flags);
+    return -1;
+}
+
+void exchange_bt(BTREE T) {
+    if (T != NULL) {
+        QUEUE *queue = init_queue(sizeof(BTREE), 10);
+        BTREE p = NULL;
+        BTREE temp = NULL;
+        push_queue(queue, &T);
+        while (!queue_is_empty(queue)) {
+            pop_queue(queue, &p);
+            temp = p->l_child;
+            p->l_child = p->r_child;
+            p->r_child = temp;
+            if (p->l_child != NULL)
+                push_queue(queue, &(p->l_child));
+            if (p->r_child != NULL)
+                push_queue(queue, &(p->r_child));
+        }
+        del_queue(queue);
+    }
+}
+
+void exchange_bt_pre(BTREE T) {
+
+}
+
+void print_bt_node(int argc, BTREE T) {
+    printf("%c ", T->data);
 }
 
 // 变长参数函数指针指向定长函数
@@ -286,10 +507,6 @@ void post_order2(BTREE T, void visit(int, ...)) {
     del_stack(stack2);
 }
 
-void print_bt_node(int argc, BTREE T) {
-    printf("%c ", T->data);
-}
-
 BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t seq_len) {
     if (seq_len == 0) {
         return NULL;
@@ -311,7 +528,7 @@ BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t
 // 转非递归的要素：1.是否满足递归终止条件  2.进递归前做了哪些事情  3.出递归做了哪些事情
 // 分两方面 1.问题还未解决，问题已经解决
 // 问题还未解决包括 1.递归前做了哪些事情并进入递归
-// 有返回值时问题已经解决包括 1.达到终止条件出递归 2.未达到终止条件出递归 回退到先祖函数不同的点，做不同的事情
+// 有返回值时问题已经解决包括 1.达到终止条件出递归 2.未达到终止条件出递归 (都是回退到先祖函数不同的点，做不同的事情)
 BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t seq_len) {
     STACK *stack_b = init_stack(sizeof(BTREE), 20);
     STACK *stack_pre = init_stack(sizeof(char *), 20);
@@ -391,4 +608,52 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
     }
     pop_stack(stack_return, &return_value);
     return return_value;
+}
+
+int btrees_are_equal_recur(BTREE T1, BTREE T2) {
+    if (T1 == NULL && T2 == NULL) {
+        return 1;
+    } else if (T1 != NULL && T2 != NULL
+               && T1->data == T2->data
+               && btrees_are_equal_recur(T1->l_child, T2->l_child)
+               && btrees_are_equal_recur(T1->r_child, T2->r_child)) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int btrees_are_similar_recur(BTREE T1, BTREE T2) {
+    if (T1 == NULL && T2 == NULL) {
+        return 1;
+    } else if (T1 != NULL && T2 != NULL
+               && btrees_are_similar_recur(T1->l_child, T2->l_child)
+               && btrees_are_similar_recur(T1->r_child, T2->r_child)) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+BTREE copy_bt(BTREE T) {
+    if (T == NULL)
+        return NULL;
+    else {
+        BTREE T2 = (BTREE) malloc(sizeof(BTNode));
+        T2->data = T->data;
+        T2->l_child = copy_bt(T->l_child);
+        T2->r_child = copy_bt(T->r_child);
+        return T2;
+    }
+}
+
+void copy_bt2(BTREE T, BTREE *T2) {
+    if (T == NULL) {
+        (*T2) = NULL;
+    } else {
+        (*T2) = (BTREE) malloc(sizeof(BTNode));
+        (*T2)->data = T->data;
+        copy_bt2(T->l_child, &((*T2)->l_child));
+        copy_bt2(T->r_child, &((*T2)->r_child));
+    }
 }
