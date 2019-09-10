@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <binary_tree.h>
+#include <thread_binary_tree.h>
 #include <utils.h>
 #include <stack.h>
 #include <queue.h>
@@ -13,8 +14,7 @@ int main() {
     //"A(B(D,E(G)),C(F(,H)))@";
     char sentence[] = "A(B(D,E(G)),C(F(,H)))@";
     int sentence_len = sizeof(sentence) / sizeof(char);
-    BTREE T = create_bt(sentence, sentence_len);
-//
+
 //    char pre[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};
 //    char in[] = {'B', 'C', 'A', 'E', 'D', 'G', 'H', 'F', 'I'};
 //    BTREE p = recover_bt_by_pre_in(pre, in, 9);
@@ -26,10 +26,9 @@ int main() {
 //    printf("\n");
 //    level_print_bt(p);
 //    printf("\n");
-    level_print_bt(T);
-    exchange_bt(T);
-    printf("\n");
-    level_print_bt(T);
+    TBTREE T = create_tbt(sentence, sentence_len);
+    in_thread(&T);
+    thr_in_order(T);
 
     return 0;
 }

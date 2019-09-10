@@ -5,7 +5,7 @@
 #ifndef BASETEST_BINARY_TREE_H
 #define BASETEST_BINARY_TREE_H
 
-#define DATATYPE char
+#include <mydef.h>
 
 typedef struct _bt_node {
     DATATYPE data;
@@ -26,18 +26,25 @@ BTREE create_bt(char *sentence, int sentence_len);
 
 BTREE create_bt_node();
 
+// 层序遍历打印结点
 void level_print_bt(BTREE T);
 
+// 计算叶子结点数目
 int count_bt_leaf_recur(BTREE T);
 
 int count_bt_leaf(BTREE T);
 
+// 计算结点的层级
 int calc_bt_node_layer(BTREE T, char item);
 
 // 交换左右子树
 void exchange_bt(BTREE T);
 
 void exchange_bt_pre(BTREE T);
+
+void exchange_bt_in(BTREE T);
+
+void exchange_bt_post(BTREE T);
 
 // 前序遍历
 void pre_order_recur(BTREE T, void visit(int argc, ...));
@@ -90,9 +97,11 @@ int bt_node_is_leaf(BTREE node);
 // visit函数
 void print_bt_node(int argc, BTREE T);
 
+// 复制二叉树
 BTREE copy_bt(BTREE T);
 
 void copy_bt2(BTREE T, BTREE *T2);
+
 
 
 #endif //BASETEST_BINARY_TREE_H

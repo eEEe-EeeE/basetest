@@ -312,7 +312,71 @@ void exchange_bt(BTREE T) {
 }
 
 void exchange_bt_pre(BTREE T) {
+    STACK *stack = init_stack(sizeof(BTREE), 10);
+    BTREE p = T;
+    BTREE temp = NULL;
+    while (!(p == NULL && stack_is_empty(stack))) {
+        if (p != NULL) {
+            temp = p->l_child;
+            p->l_child = p->r_child;
+            p->r_child = temp;
+            push_stack(stack, &p);
+            p = p->r_child;
+        } else {
+            pop_stack(stack, &p);
+            p = p->l_child;
+        }
+    }
+    del_stack(stack);
+}
 
+void exchange_bt_in(BTREE T) {
+    STACK *stack = init_stack(sizeof(BTREE), 10);
+    BTREE p = T;
+    BTREE temp = NULL;
+    while (!(p == NULL && stack_is_empty(stack))) {
+        if (p != NULL) {
+            push_stack(stack, &p);
+            p = p->l_child;
+        } else {
+            pop_stack(stack, &p);
+            temp = p->l_child;
+            p->l_child = p->r_child;
+            p->r_child = temp;
+            p = p->l_child;
+        }
+    }
+    del_stack(stack);
+}
+
+void exchange_bt_post(BTREE T) {
+    STACK *stack = init_stack(sizeof(BTREE), 10);
+    STACK *flags = init_stack(sizeof(_Bool), 10);
+    BTREE p = T;
+    _Bool flag = false;
+    _Bool TRUE = true;
+    _Bool FALSE = false;
+    BTREE temp = NULL;
+    while (!(p == NULL && stack_is_empty(stack))) {
+        if (p != NULL) {
+            push_stack(stack, &p);
+            push_stack(flags, &FALSE);
+            p = p->l_child;
+        } else {
+            pop_stack(stack, &p);
+            pop_stack(flags, &flag);
+            if (flag == false) {
+                push_stack(stack, &p);
+                push_stack(flags, &TRUE);
+                p = p->r_child;
+            } else {
+                temp = p->l_child;
+                p->l_child = p->r_child;
+                p->r_child = temp;
+                p = NULL;
+            }
+        }
+    }
 }
 
 void print_bt_node(int argc, BTREE T) {
@@ -657,3 +721,4 @@ void copy_bt2(BTREE T, BTREE *T2) {
         copy_bt2(T->r_child, &((*T2)->r_child));
     }
 }
+

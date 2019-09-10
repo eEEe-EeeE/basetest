@@ -18,4 +18,4 @@ add_executable(basetest
         lib/queue.c
         include/stack.h
         lib/stack.c
-        )
+        include/mydef.h include/thread_binary_tree.h lib/thread_binary_tree.c)
