@@ -14,43 +14,37 @@
 
 #define MAXSIZE 100
 
-BTREE create_bt(char *sentence, int sentence_len) {
+BTREE create_bt(DATATYPE*sentences) {
     BTREE STACK[MAXSIZE], p = NULL, T = NULL;
     int top = -1;
     int flag = 0;
-    char ch = '\0';
-    char *s = sentence;
-    while (sentence_len != 0) {
-        sscanf(s, "%c", &ch);
-        switch (ch) {
-            case '@':
-                return T;
-            case '(':
-                STACK[++top] = p;
-                flag = 1;
-                break;
-            case ',':
-                flag = 2;
-                break;
-            case ')':
-                --top;
-                break;
-            default:
-                p = (BTREE) malloc(sizeof(BTNode));
-                p->data = ch;
-                p->l_child = NULL;
-                p->r_child = NULL;
-                if (T == NULL)
-                    T = p;
-                else if (flag == 1) {
-                    STACK[top]->l_child = p;
-                } else {
-                    STACK[top]->r_child = p;
-                }
-                break;
+    char *str = "";
+    char **sp = sentences;
+    while (*sp != NULL) {
+        sscanf(*sp, "%s", str);
+        if (!strcmp("@", str)) {
+            return T;
+        } else if (!strcmp("(", str)) {
+            STACK[++top] = p;
+            flag = 1;
+        } else if (!strcmp(",", str)) {
+            flag = 2;
+        } else if (!strcmp(")", str)) {
+            --top;
+        } else {
+            p = (BTREE) malloc(sizeof(BTNode));
+            p->data = str;
+            p->l_child = NULL;
+            p->r_child = NULL;
+            if (T == NULL)
+                T = p;
+            else if (flag == 1) {
+                STACK[top]->l_child = p;
+            } else {
+                STACK[top]->r_child = p;
+            }
         }
-        s += 1;
-        --sentence_len;
+        ++sp;
     }
     return NULL;
 }
@@ -66,13 +60,13 @@ BTREE create_bt_node() {
 }
 
 void build_bt(BTREE *T) {
-    char ch;
-    scanf("%c", &ch);
-    if (ch == ' ') {
+    char *str = "";
+    scanf("%s", str);
+    if (!strcmp(" ", str)) {
         (*T) = NULL;
     } else {
         (*T) = (BTREE) malloc(sizeof(BTNode));
-        (*T)->data = ch;
+        (*T)->data = str;
         build_bt(&((*T)->l_child));
         build_bt(&((*T)->r_child));
     }
@@ -92,7 +86,7 @@ void clear_bt(BTREE *T) {
     (*T) = NULL;
 }
 
-BTREE delete_bt(BTREE *T, char item) {
+BTREE delete_bt(BTREE *T, DATATYPE item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     BTREE p = *T;
     BTREE q = NULL;
@@ -260,7 +254,7 @@ int count_bt_depth_post(BTREE T) {
 
 // 后序遍历访问某个结点时，该结点的所有先祖节点依次都在栈里，其他遍历方式不存在这种情况
 // 其他遍历方式也可以做
-int calc_bt_node_layer(BTREE T, char item) {
+int calc_bt_node_layer(BTREE T, DATATYPE item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     STACK *flags = init_stack(sizeof(_Bool), 20);
     _Bool flag = false;
@@ -571,14 +565,14 @@ void post_order2(BTREE T, void visit(int, ...)) {
     del_stack(stack2);
 }
 
-BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t seq_len) {
+BTREE recover_bt_by_pre_in_recur(const DATATYPE*pre_seq, const DATATYPE*in_seq, size_t seq_len) {
     if (seq_len == 0) {
         return NULL;
     }
 
     BTREE T = create_bt_node();
     T->data = *pre_seq;
-    char *in_root = (char *) memchr(in_seq, T->data, sizeof(char) * seq_len);
+    DATATYPE*in_root = (DATATYPE*) memchr(in_seq, T->data, sizeof(DATATYPE) * seq_len);
 
     T->l_child = recover_bt_by_pre_in_recur(pre_seq + 1, in_seq,
                                             in_root - in_seq);
@@ -593,11 +587,11 @@ BTREE recover_bt_by_pre_in_recur(const char *pre_seq, const char *in_seq, size_t
 // 分两方面 1.问题还未解决，问题已经解决
 // 问题还未解决包括 1.递归前做了哪些事情并进入递归
 // 有返回值时问题已经解决包括 1.达到终止条件出递归 2.未达到终止条件出递归 (都是回退到先祖函数不同的点，做不同的事情)
-BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t seq_len) {
+BTREE recover_bt_by_pre_in(const DATATYPE*pre_seq, const DATATYPE*in_seq, const size_t seq_len) {
     STACK *stack_b = init_stack(sizeof(BTREE), 20);
-    STACK *stack_pre = init_stack(sizeof(char *), 20);
-    STACK *stack_in = init_stack(sizeof(char *), 20);
-    STACK *stack_root = init_stack(sizeof(char *), 20);
+    STACK *stack_pre = init_stack(sizeof(DATATYPE*), 20);
+    STACK *stack_in = init_stack(sizeof(DATATYPE*), 20);
+    STACK *stack_root = init_stack(sizeof(DATATYPE*), 20);
     STACK *stack_u = init_stack(sizeof(size_t), 20);
     // 0表示左，1表示右
     STACK *stack_f = init_stack(sizeof(_Bool), 20);
@@ -605,9 +599,9 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
     BTREE T;
 
     char *in_root;
-    const char *p_seq = pre_seq;
-    const char *i_seq = in_seq;
-    const char *temp_i_seq;
+    const DATATYPE*p_seq = pre_seq;
+    const DATATYPE*i_seq = in_seq;
+    const DATATYPE*temp_i_seq;
     size_t s_len = seq_len;
     BTREE return_value;
 
@@ -623,7 +617,7 @@ BTREE recover_bt_by_pre_in(const char *pre_seq, const char *in_seq, const size_t
             // 此时处于一个非空节点上，问题的规模不为零，前序序列和中序序列不为零，可建立结点
             T = create_bt_node();
             T->data = *p_seq;
-            in_root = (char *) memchr(i_seq, T->data, sizeof(char) * s_len);
+            in_root = (DATATYPE*) memchr(i_seq, T->data, sizeof(DATATYPE) * s_len);
             push_stack(stack_b, &T);
             push_stack(stack_pre, &p_seq);
             push_stack(stack_in, &i_seq);

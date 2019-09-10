@@ -12,8 +12,8 @@
 int main() {
 
     //"A(B(D,E(G)),C(F(,H)))@";
-    char sentence[] = "A(B(D,E(G)),C(F(,H)))@";
-    int sentence_len = sizeof(sentence) / sizeof(char);
+    char *sentences[] = {"A", "(", "B", "(", "D", ",", "E", "(", "G", ")", ")", ",", "C", "(", "F", "(", ",", "H", ")",
+                         ")", ")", "@", NULL};
 
 //    char pre[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'};
 //    char in[] = {'B', 'C', 'A', 'E', 'D', 'G', 'H', 'F', 'I'};
@@ -26,9 +26,8 @@ int main() {
 //    printf("\n");
 //    level_print_bt(p);
 //    printf("\n");
-    TBTREE T = create_tbt(sentence, sentence_len);
-    in_thread(&T);
-    thr_in_order(T);
-
+    char *str = (char *) malloc(20);
+    scanf("%s", str);
+    printf("|%s|", str);
     return 0;
 }

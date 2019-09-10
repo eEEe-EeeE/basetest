@@ -5,6 +5,6 @@
 #ifndef BASETEST_MYDEF_H
 #define BASETEST_MYDEF_H
 
-#define DATATYPE char
+#define DATATYPE char*
 
 #endif //BASETEST_MYDEF_H
