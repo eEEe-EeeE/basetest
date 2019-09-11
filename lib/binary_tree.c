@@ -11,27 +11,33 @@
 #include <binary_tree.h>
 #include <queue.h>
 #include <stack.h>
+#include <utils.h>
 
 #define MAXSIZE 100
+#define MAXWORDSLEN 32
 
-BTREE create_bt(DATATYPE*sentences) {
-    BTREE STACK[MAXSIZE], p = NULL, T = NULL;
-    int top = -1;
+BTREE create_bt(STRING*words) {
+    STACK *stack = init_stack(sizeof(BTREE), 10);
+    BTREE p = NULL;
+    BTREE parent = NULL;
+    BTREE T = NULL;
     int flag = 0;
-    char *str = "";
-    char **sp = sentences;
+    char *str = NULL;
+    char **sp = words;
     while (*sp != NULL) {
-        sscanf(*sp, "%s", str);
-        if (!strcmp("@", str)) {
+        if (!strcmp("@", *sp)) {
+            del_stack(stack);
             return T;
-        } else if (!strcmp("(", str)) {
-            STACK[++top] = p;
+        } else if (!strcmp("(", *sp)) {
+            push_stack(stack, &p);
             flag = 1;
-        } else if (!strcmp(",", str)) {
+        } else if (!strcmp(",", *sp)) {
             flag = 2;
-        } else if (!strcmp(")", str)) {
-            --top;
+        } else if (!strcmp(")", *sp)) {
+            pop_stack(stack, &p);
         } else {
+            str = (char *) malloc(strlen(*sp) + 1);
+            strcpy(str, *sp);
             p = (BTREE) malloc(sizeof(BTNode));
             p->data = str;
             p->l_child = NULL;
@@ -39,34 +45,43 @@ BTREE create_bt(DATATYPE*sentences) {
             if (T == NULL)
                 T = p;
             else if (flag == 1) {
-                STACK[top]->l_child = p;
+                pop_stack(stack, &parent);
+                parent->l_child = p;
+                push_stack(stack, &parent);
             } else {
-                STACK[top]->r_child = p;
+                pop_stack(stack, &parent);
+                parent->r_child = p;
+                push_stack(stack, &parent);
             }
         }
         ++sp;
     }
+    del_stack(stack);
     return NULL;
 }
 
-BTREE create_bt_node() {
+BTREE create_bt_node(STRING string) {
+    if (string == NULL)
+        return NULL;
     BTREE p = (BTREE) malloc(sizeof(BTNode));
     if (p != NULL) {
-        p->data = 0;
-        p->r_child = NULL;
+        p->data = (STRING) malloc(strlen(string) + 1);
+        strcpy(p->data, string);
+        p->l_child = NULL;
         p->r_child = NULL;
     }
     return p;
 }
 
 void build_bt(BTREE *T) {
-    char *str = "";
+    char *str = (char *) malloc(MAXWORDSLEN);
     scanf("%s", str);
-    if (!strcmp(" ", str)) {
+    if (!strcmp(",", str)) {
         (*T) = NULL;
     } else {
         (*T) = (BTREE) malloc(sizeof(BTNode));
-        (*T)->data = str;
+        (*T)->data = (STRING) malloc(strlen(str) + 1);
+        strcpy((*T)->data, str);
         build_bt(&((*T)->l_child));
         build_bt(&((*T)->r_child));
     }
@@ -77,6 +92,7 @@ void destroy_bt(BTREE T) {
     if (T != NULL) {
         destroy_bt(T->l_child);
         destroy_bt(T->r_child);
+        free(T->data);
         free(T);
     }
 }
@@ -86,34 +102,37 @@ void clear_bt(BTREE *T) {
     (*T) = NULL;
 }
 
-BTREE delete_bt(BTREE *T, DATATYPE item) {
+BTREE delete_bt(BTREE *T, const STRING item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     BTREE p = *T;
-    BTREE q = NULL;
+    BTREE parent = NULL;
     if ((*T)->data == item) {
         clear_bt(T);
+        del_stack(stack);
         return NULL;
     } else {
         while (!(p == NULL && stack_is_empty(stack))) {
             if (p != NULL) {
                 if (p->data == item) {
-                    if (q->l_child == p)
-                        q->l_child = NULL;
-                    else if (q->r_child == p)
-                        q->r_child = NULL;
+                    if (parent->l_child == p)
+                        parent->l_child = NULL;
+                    else if (parent->r_child == p)
+                        parent->r_child = NULL;
                     clear_bt(&p);
+                    del_stack(stack);
                     return *T;
                 }
                 push_stack(stack, &p);
-                q = p;
+                parent = p;
                 p = p->l_child;
             } else {
                 pop_stack(stack, &p);
-                q = p;
+                parent = p;
                 p = p->r_child;
             }
         }
     }
+    del_stack(stack);
     return *T;
 }
 
@@ -128,7 +147,7 @@ void level_print_bt(BTREE T) {
                 push_queue(q, &p->l_child);
             if (p->r_child != NULL)
                 push_queue(q, &p->r_child);
-            printf("%c ", p->data);
+            printf("%s ", p->data);
         }
         del_queue(q);
     }
@@ -254,7 +273,7 @@ int count_bt_depth_post(BTREE T) {
 
 // 后序遍历访问某个结点时，该结点的所有先祖节点依次都在栈里，其他遍历方式不存在这种情况
 // 其他遍历方式也可以做
-int calc_bt_node_layer(BTREE T, DATATYPE item) {
+int calc_bt_node_layer(BTREE T, const STRING item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     STACK *flags = init_stack(sizeof(_Bool), 20);
     _Bool flag = false;
@@ -371,10 +390,12 @@ void exchange_bt_post(BTREE T) {
             }
         }
     }
+    del_stack(stack);
+    del_stack(flags);
 }
 
 void print_bt_node(int argc, BTREE T) {
-    printf("%c ", T->data);
+    printf("%s ", T->data);
 }
 
 // 变长参数函数指针指向定长函数
@@ -565,20 +586,19 @@ void post_order2(BTREE T, void visit(int, ...)) {
     del_stack(stack2);
 }
 
-BTREE recover_bt_by_pre_in_recur(const DATATYPE*pre_seq, const DATATYPE*in_seq, size_t seq_len) {
+BTREE recover_bt_by_pre_in_recur(STRING*pre_seq, STRING*in_seq, size_t seq_len) {
     if (seq_len == 0) {
         return NULL;
     }
 
-    BTREE T = create_bt_node();
-    T->data = *pre_seq;
-    DATATYPE*in_root = (DATATYPE*) memchr(in_seq, T->data, sizeof(DATATYPE) * seq_len);
+    BTREE T = create_bt_node(*pre_seq);
 
-    T->l_child = recover_bt_by_pre_in_recur(pre_seq + 1, in_seq,
-                                            in_root - in_seq);
+    size_t in_root_offset = linear_search_str(in_seq, T->data);
 
-    T->r_child = recover_bt_by_pre_in_recur(pre_seq + 1 + (in_root - in_seq), in_root + 1,
-                                            (in_seq + seq_len - 1) - in_root);
+    T->l_child = recover_bt_by_pre_in_recur(pre_seq + 1, in_seq, in_root_offset);
+
+    T->r_child = recover_bt_by_pre_in_recur(pre_seq + 1 + in_root_offset, in_seq + in_root_offset + 1,
+                                            (seq_len - 1) - in_root_offset);
 
     return T;
 }
@@ -587,21 +607,20 @@ BTREE recover_bt_by_pre_in_recur(const DATATYPE*pre_seq, const DATATYPE*in_seq, 
 // 分两方面 1.问题还未解决，问题已经解决
 // 问题还未解决包括 1.递归前做了哪些事情并进入递归
 // 有返回值时问题已经解决包括 1.达到终止条件出递归 2.未达到终止条件出递归 (都是回退到先祖函数不同的点，做不同的事情)
-BTREE recover_bt_by_pre_in(const DATATYPE*pre_seq, const DATATYPE*in_seq, const size_t seq_len) {
+BTREE recover_bt_by_pre_in(STRING*pre_seq, STRING*in_seq, size_t seq_len) {
     STACK *stack_b = init_stack(sizeof(BTREE), 20);
-    STACK *stack_pre = init_stack(sizeof(DATATYPE*), 20);
-    STACK *stack_in = init_stack(sizeof(DATATYPE*), 20);
-    STACK *stack_root = init_stack(sizeof(DATATYPE*), 20);
+    STACK *stack_pre = init_stack(sizeof(STRING*), 20);
+    STACK *stack_in = init_stack(sizeof(STRING*), 20);
+    STACK *stack_root = init_stack(sizeof(size_t), 20);
     STACK *stack_u = init_stack(sizeof(size_t), 20);
     // 0表示左，1表示右
     STACK *stack_f = init_stack(sizeof(_Bool), 20);
     STACK *stack_return = init_stack(sizeof(BTREE), 20);
     BTREE T;
 
-    char *in_root;
-    const DATATYPE*p_seq = pre_seq;
-    const DATATYPE*i_seq = in_seq;
-    const DATATYPE*temp_i_seq;
+    size_t in_root_offset;
+    STRING*p_seq = pre_seq;
+    STRING*i_seq = in_seq;
     size_t s_len = seq_len;
     BTREE return_value;
 
@@ -615,19 +634,17 @@ BTREE recover_bt_by_pre_in(const DATATYPE*pre_seq, const DATATYPE*in_seq, const 
         // len == 0 && flag == 1表示问题已解决且问题规模不为零
         if (s_len != 0) {
             // 此时处于一个非空节点上，问题的规模不为零，前序序列和中序序列不为零，可建立结点
-            T = create_bt_node();
-            T->data = *p_seq;
-            in_root = (DATATYPE*) memchr(i_seq, T->data, sizeof(DATATYPE) * s_len);
+            T = create_bt_node(*p_seq);
+            in_root_offset = linear_search_str(i_seq, T->data);
             push_stack(stack_b, &T);
             push_stack(stack_pre, &p_seq);
             push_stack(stack_in, &i_seq);
-            push_stack(stack_root, &in_root);
+            push_stack(stack_root, &in_root_offset);
             push_stack(stack_u, &s_len);
             push_stack(stack_f, &FALSE);
             p_seq = p_seq + 1;
-            s_len = in_root - i_seq;
+            s_len = in_root_offset;
             // 此时进入子函数
-            continue;
         } else {
             // 此时处于一个空结点上，前序序列和中序序列不存在
             if (flag == false) {
@@ -637,7 +654,7 @@ BTREE recover_bt_by_pre_in(const DATATYPE*pre_seq, const DATATYPE*in_seq, const 
             pop_stack(stack_b, &T);
             pop_stack(stack_pre, &p_seq);
             pop_stack(stack_in, &i_seq);
-            pop_stack(stack_root, &in_root);
+            pop_stack(stack_root, &in_root_offset);
             pop_stack(stack_u, &s_len);
             pop_stack(stack_f, &flag);
             pop_stack(stack_return, &return_value);
@@ -647,13 +664,12 @@ BTREE recover_bt_by_pre_in(const DATATYPE*pre_seq, const DATATYPE*in_seq, const 
                 push_stack(stack_b, &T);
                 push_stack(stack_pre, &p_seq);
                 push_stack(stack_in, &i_seq);
-                push_stack(stack_root, &in_root);
+                push_stack(stack_root, &in_root_offset);
                 push_stack(stack_u, &s_len);
                 push_stack(stack_f, &TRUE);
-                p_seq = p_seq + 1 + (in_root - i_seq);
-                temp_i_seq = i_seq;
-                i_seq = in_root + 1;
-                s_len = (temp_i_seq + s_len - 1) - in_root;
+                p_seq = p_seq + 1 + in_root_offset;
+                i_seq = i_seq + in_root_offset + 1;
+                s_len = (s_len - 1) - in_root_offset;
                 // 此时进入子函数
             } else {
                 // 进入这里表示问题已解决且规模不为零
@@ -665,6 +681,14 @@ BTREE recover_bt_by_pre_in(const DATATYPE*pre_seq, const DATATYPE*in_seq, const 
         }
     }
     pop_stack(stack_return, &return_value);
+
+    del_stack(stack_b);
+    del_stack(stack_f);
+    del_stack(stack_in);
+    del_stack(stack_pre);
+    del_stack(stack_return);
+    del_stack(stack_root);
+    del_stack(stack_u);
     return return_value;
 }
 

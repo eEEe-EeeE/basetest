@@ -15,9 +15,9 @@ int *fib_recur(int n) {
         return NULL;
     int *arr = (int *) malloc(sizeof(int) * n);
     memset(arr, 0, sizeof(int) * n);
-    if (n == 1){
-        arr[0] = 1;}
-    else if (n >= 2) {
+    if (n == 1) {
+        arr[0] = 1;
+    } else if (n >= 2) {
         arr[0] = 1;
         arr[1] = 1;
     }
@@ -103,3 +103,13 @@ int linear_search(void *arr, size_t len, size_t elem_size, void *key) {
     return -1;
 }
 
+int linear_search_str(char **pString, char *string) {
+    char **sp = NULL;
+    int index = -1;
+    for (sp = pString; *sp != NULL; ++sp) {
+        ++index;
+        if (!strcmp(string, *sp))
+            return index;
+    }
+    return -1;
+}

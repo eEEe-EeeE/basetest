@@ -8,22 +8,23 @@
 #include <mydef.h>
 
 typedef struct _bt_node {
-    DATATYPE data;
+    STRING data;
     struct _bt_node *l_child;
     struct _bt_node *r_child;
 } BTNode, *BTREE;
 
-BTREE create_bt(DATATYPE *sentences);
+BTREE create_bt(STRING*words);
 
-BTREE create_bt_node();
+BTREE create_bt_node(STRING string);
 
+// 前序遍历建立二叉树
 void build_bt(BTREE *T);
 
 void destroy_bt(BTREE T);
 
 void clear_bt(BTREE *T);
 
-BTREE delete_bt(BTREE *T, DATATYPE item);
+BTREE delete_bt(BTREE *T, const STRING item);
 
 // 层序遍历打印结点
 void level_print_bt(BTREE T);
@@ -34,7 +35,7 @@ int count_bt_leaf_recur(BTREE T);
 int count_bt_leaf(BTREE T);
 
 // 计算结点的层级
-int calc_bt_node_layer(BTREE T, DATATYPE item);
+int calc_bt_node_layer(BTREE T, const STRING item);
 
 // 交换左右子树
 void exchange_bt(BTREE T);
@@ -71,9 +72,9 @@ void post_order(BTREE T, void visit(int, ...));
 void post_order2(BTREE T, void visit(int, ...));
 
 // 前中序列恢复二叉树
-BTREE recover_bt_by_pre_in_recur(const DATATYPE *pre_seq, const DATATYPE *in_seq, size_t seq_len);
+BTREE recover_bt_by_pre_in_recur(STRING*pre_seq, STRING*in_seq, size_t seq_len);
 
-BTREE recover_bt_by_pre_in(const DATATYPE *pre_seq, const DATATYPE *in_seq, size_t seq_len);
+BTREE recover_bt_by_pre_in(STRING*pre_seq, STRING*in_seq, size_t seq_len);
 
 // 二叉树深度
 int count_bt_depth_recur(BTREE T);
@@ -100,7 +101,6 @@ void print_bt_node(int argc, BTREE T);
 BTREE copy_bt(BTREE T);
 
 void copy_bt2(BTREE T, BTREE *T2);
-
 
 
 #endif //BASETEST_BINARY_TREE_H

@@ -7,7 +7,7 @@
 
 #include <mydef.h>
 typedef struct _thr_bt_node {
-    DATATYPE data;
+    STRING data;
     struct _thr_bt_node *l_child;
     struct _thr_bt_node *r_child;
     int l_bit;
