@@ -16,14 +16,14 @@
 #define MAXSIZE 100
 #define MAXWORDSLEN 32
 
-BTREE create_bt(STRING*words) {
+BTREE create_bt(CONST_STRING *words) {
     STACK *stack = init_stack(sizeof(BTREE), 10);
     BTREE p = NULL;
     BTREE parent = NULL;
     BTREE T = NULL;
     int flag = 0;
-    char *str = NULL;
-    char **sp = words;
+    STRING str = NULL;
+    const STRING*sp = words;
     while (*sp != NULL) {
         if (!strcmp("@", *sp)) {
             del_stack(stack);
@@ -36,12 +36,7 @@ BTREE create_bt(STRING*words) {
         } else if (!strcmp(")", *sp)) {
             pop_stack(stack, &p);
         } else {
-            str = (char *) malloc(strlen(*sp) + 1);
-            strcpy(str, *sp);
-            p = (BTREE) malloc(sizeof(BTNode));
-            p->data = str;
-            p->l_child = NULL;
-            p->r_child = NULL;
+            p = create_bt_node(*sp);
             if (T == NULL)
                 T = p;
             else if (flag == 1) {
@@ -60,31 +55,31 @@ BTREE create_bt(STRING*words) {
     return NULL;
 }
 
-BTREE create_bt_node(STRING string) {
-    if (string == NULL)
-        return NULL;
-    BTREE p = (BTREE) malloc(sizeof(BTNode));
-    if (p != NULL) {
-        p->data = (STRING) malloc(strlen(string) + 1);
-        strcpy(p->data, string);
-        p->l_child = NULL;
-        p->r_child = NULL;
+BTREE create_bt_node(CONST_STRING string) {
+    if (string != NULL) {
+        BTREE p = (BTREE) malloc(sizeof(BTNode));
+        if (p != NULL) {
+            p->data = (STRING) malloc(strlen(string) + 1);
+            strcpy(p->data, string);
+            p->l_child = NULL;
+            p->r_child = NULL;
+            return p;
+        }
     }
-    return p;
+    return NULL;
 }
 
 void build_bt(BTREE *T) {
-    char *str = (char *) malloc(MAXWORDSLEN);
+    STRING str = (STRING) malloc(MAXWORDSLEN);
     scanf("%s", str);
     if (!strcmp(",", str)) {
         (*T) = NULL;
     } else {
-        (*T) = (BTREE) malloc(sizeof(BTNode));
-        (*T)->data = (STRING) malloc(strlen(str) + 1);
-        strcpy((*T)->data, str);
+        (*T) = create_bt_node(str);
         build_bt(&((*T)->l_child));
         build_bt(&((*T)->r_child));
     }
+    free(str);
 }
 
 // 销毁树的时候，后序遍历最合适
@@ -102,7 +97,7 @@ void clear_bt(BTREE *T) {
     (*T) = NULL;
 }
 
-BTREE delete_bt(BTREE *T, const STRING item) {
+BTREE delete_bt(BTREE *T, CONST_STRING item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     BTREE p = *T;
     BTREE parent = NULL;
@@ -273,7 +268,7 @@ int count_bt_depth_post(BTREE T) {
 
 // 后序遍历访问某个结点时，该结点的所有先祖节点依次都在栈里，其他遍历方式不存在这种情况
 // 其他遍历方式也可以做
-int calc_bt_node_layer(BTREE T, const STRING item) {
+int calc_bt_node_layer(BTREE T, CONST_STRING item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     STACK *flags = init_stack(sizeof(_Bool), 20);
     _Bool flag = false;
@@ -740,3 +735,22 @@ void copy_bt2(BTREE T, BTREE *T2) {
     }
 }
 
+BTREE create_bst(CONST_STRING *keys) {
+    BTREE T = NULL;
+    while (*keys != NULL) {
+        insert_bst_recur(&T, *keys);
+        ++keys;
+    }
+    return T;
+}
+
+void insert_bst_recur(BTREE *T, CONST_STRING item) {
+    STRING str = NULL;
+    if ((*T) == NULL) {
+        (*T) = create_bt_node(item);
+    } else if (strtol(item, &str, 10) < strtol((*T)->data, &str, 10)) {
+        insert_bst_recur(&((*T)->l_child), item);
+    } else {
+        insert_bst_recur(&((*T)->r_child), item);
+    }
+}

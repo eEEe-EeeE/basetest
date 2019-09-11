@@ -6,6 +6,7 @@
 #define BASETEST_THREAD_BINARY_TREE_H
 
 #include <mydef.h>
+
 typedef struct _thr_bt_node {
     STRING data;
     struct _thr_bt_node *l_child;
@@ -15,7 +16,9 @@ typedef struct _thr_bt_node {
 } TBTNode, *TBTREE;
 
 
-TBTREE create_tbt(char *sentence, int sentence_len);
+TBTREE create_tbt(STRING*words);
+
+TBTREE create_tbt_node(STRING string);
 
 void in_thread(TBTREE *HEAD);
 

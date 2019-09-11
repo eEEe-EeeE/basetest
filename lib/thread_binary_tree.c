@@ -6,52 +6,67 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <stack.h>
 
 #define MAXSIZE 100
-TBTREE create_tbt(char *sentence, int sentence_len) {
-    TBTREE STACK[MAXSIZE], p = NULL, T = NULL;
-    int top = -1;
+
+TBTREE create_tbt(STRING*words) {
+    STACK *stack = init_stack(sizeof(TBTREE), 10);
+    TBTREE p = NULL;
+    TBTREE parent = NULL;
+    TBTREE T = NULL;
     int flag = 0;
-    char ch = '\0';
-    char *s = sentence;
-    while (sentence_len != 0) {
-        sscanf(s, "%c", &ch);
-        switch (ch) {
-            case '@':
-                return T;
-            case '(':
-                STACK[++top] = p;
-                flag = 1;
-                break;
-            case ',':
-                flag = 2;
-                break;
-            case ')':
-                --top;
-                break;
-            default:
-                p = (TBTREE) malloc(sizeof(TBTNode));
-                p->data = ch;
-                p->l_child = NULL;
-                p->r_child = NULL;
-                p->l_bit = 1;
-                p->r_bit = 1;
-                if (T == NULL)
-                    T = p;
-                else if (flag == 1) {
-                    STACK[top]->l_child = p;
-                } else {
-                    STACK[top]->r_child = p;
-                }
-                break;
+    char *str = NULL;
+    char **sp = words;
+    while (*sp != NULL) {
+        if (!strcmp("@", *sp)) {
+            del_stack(stack);
+            return T;
+        } else if (!strcmp("(", *sp)) {
+            push_stack(stack, &p);
+            flag = 1;
+        } else if (!strcmp(",", *sp)) {
+            flag = 2;
+        } else if (!strcmp(")", *sp)) {
+            pop_stack(stack, &p);
+        } else {
+            p = create_tbt_node(*sp);
+            if (T == NULL)
+                T = p;
+            else if (flag == 1) {
+                pop_stack(stack, &parent);
+                parent->l_child = p;
+                push_stack(stack, &parent);
+            } else {
+                pop_stack(stack, &parent);
+                parent->r_child = p;
+                push_stack(stack, &parent);
+            }
         }
-        s += 1;
-        --sentence_len;
+        ++sp;
     }
+    del_stack(stack);
     return NULL;
 }
 
+
+TBTREE create_tbt_node(STRING string) {
+    if (string != NULL) {
+        TBTREE pNode = (TBTREE) malloc(sizeof(TBTNode));
+        if (pNode != NULL) {
+            pNode->data = (STRING) malloc(strlen(string) + 1);
+            strcpy(pNode->data, string);
+            pNode->l_child = NULL;
+            pNode->l_bit = 1;
+            pNode->r_child = NULL;
+            pNode->r_bit = 1;
+            return pNode;
+        }
+    }
+    return NULL;
+}
 
 void _in_thread(TBTREE HEAD, TBTREE *prior) {
     if (HEAD != NULL) {
