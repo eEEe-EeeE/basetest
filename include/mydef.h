@@ -6,6 +6,5 @@
 #define BASETEST_MYDEF_H
 
 #define STRING char*
-#define CONST_STRING const char*
 
 #endif //BASETEST_MYDEF_H

@@ -18,9 +18,8 @@ TBTREE create_tbt(STRING*words) {
     TBTREE parent = NULL;
     TBTREE T = NULL;
     int flag = 0;
-    char *str = NULL;
-    char **sp = words;
-    while (*sp != NULL) {
+    STRING*sp = words;
+    while (sp != NULL) {
         if (!strcmp("@", *sp)) {
             del_stack(stack);
             return T;
@@ -39,7 +38,7 @@ TBTREE create_tbt(STRING*words) {
                 pop_stack(stack, &parent);
                 parent->l_child = p;
                 push_stack(stack, &parent);
-            } else {
+            } else if (flag == 2) {
                 pop_stack(stack, &parent);
                 parent->r_child = p;
                 push_stack(stack, &parent);
@@ -57,12 +56,14 @@ TBTREE create_tbt_node(STRING string) {
         TBTREE pNode = (TBTREE) malloc(sizeof(TBTNode));
         if (pNode != NULL) {
             pNode->data = (STRING) malloc(strlen(string) + 1);
-            strcpy(pNode->data, string);
-            pNode->l_child = NULL;
-            pNode->l_bit = 1;
-            pNode->r_child = NULL;
-            pNode->r_bit = 1;
-            return pNode;
+            if (pNode->data != NULL) {
+                strcpy(pNode->data, string);
+                pNode->l_child = NULL;
+                pNode->l_bit = 1;
+                pNode->r_child = NULL;
+                pNode->r_bit = 1;
+                return pNode;
+            }
         }
     }
     return NULL;
@@ -87,16 +88,13 @@ void _in_thread(TBTREE HEAD, TBTREE *prior) {
 }
 
 void in_thread(TBTREE *HEAD) {
-    TBTREE temp = malloc(sizeof(TBTNode));
+    TBTREE temp = create_tbt_node("HEAD");
     if (temp != NULL) {
-        temp->l_bit = 1;
-        temp->r_bit = 1;
         temp->l_child = *HEAD;
-        temp->r_child = NULL;
         *HEAD = temp;
         TBTREE prior = *HEAD;
         _in_thread(*HEAD, &prior);
-        (*HEAD)->r_child = (*HEAD);
+        (*HEAD)->r_child = *HEAD;
         (*HEAD)->r_bit = 1;
     }
 }
@@ -127,6 +125,6 @@ void thr_in_order(TBTREE HEAD) {
         p = in_succ(p);
         if (p == HEAD)
             break;
-        printf("%c ", p->data);
+        printf("%s ", p->data);
     }
 }

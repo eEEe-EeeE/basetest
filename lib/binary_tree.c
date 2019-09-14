@@ -16,15 +16,14 @@
 #define MAXSIZE 100
 #define MAXWORDSLEN 32
 
-BTREE create_bt(CONST_STRING *words) {
+BTREE create_bt(STRING*words) {
     STACK *stack = init_stack(sizeof(BTREE), 10);
     BTREE p = NULL;
     BTREE parent = NULL;
     BTREE T = NULL;
     int flag = 0;
-    STRING str = NULL;
-    const STRING*sp = words;
-    while (*sp != NULL) {
+    STRING*sp = words;
+    while (sp != NULL) {
         if (!strcmp("@", *sp)) {
             del_stack(stack);
             return T;
@@ -43,7 +42,7 @@ BTREE create_bt(CONST_STRING *words) {
                 pop_stack(stack, &parent);
                 parent->l_child = p;
                 push_stack(stack, &parent);
-            } else {
+            } else if (flag == 2) {
                 pop_stack(stack, &parent);
                 parent->r_child = p;
                 push_stack(stack, &parent);
@@ -55,18 +54,32 @@ BTREE create_bt(CONST_STRING *words) {
     return NULL;
 }
 
-BTREE create_bt_node(CONST_STRING string) {
+BTREE create_bt_node(STRING string) {
     if (string != NULL) {
         BTREE p = (BTREE) malloc(sizeof(BTNode));
         if (p != NULL) {
             p->data = (STRING) malloc(strlen(string) + 1);
-            strcpy(p->data, string);
-            p->l_child = NULL;
-            p->r_child = NULL;
-            return p;
+            if (p->data != NULL) {
+                strcpy(p->data, string);
+                p->l_child = NULL;
+                p->r_child = NULL;
+                return p;
+            }
         }
     }
     return NULL;
+}
+
+void destroy_bt_node(BTREE T) {
+    if (T != NULL) {
+        free(T->data);
+        free(T);
+    }
+}
+
+void clear_bt_node(BTREE *T) {
+    destroy_bt_node(*T);
+    *T = NULL;
 }
 
 void build_bt(BTREE *T) {
@@ -94,21 +107,21 @@ void destroy_bt(BTREE T) {
 
 void clear_bt(BTREE *T) {
     destroy_bt(*T);
-    (*T) = NULL;
+    *T = NULL;
 }
 
-BTREE delete_bt(BTREE *T, CONST_STRING item) {
+BTREE delete_bt(BTREE *T, STRING item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     BTREE p = *T;
     BTREE parent = NULL;
-    if ((*T)->data == item) {
+    if (!strcmp((*T)->data, item)) {
         clear_bt(T);
         del_stack(stack);
         return NULL;
     } else {
         while (!(p == NULL && stack_is_empty(stack))) {
             if (p != NULL) {
-                if (p->data == item) {
+                if (!strcmp(p->data, item)) {
                     if (parent->l_child == p)
                         parent->l_child = NULL;
                     else if (parent->r_child == p)
@@ -268,7 +281,7 @@ int count_bt_depth_post(BTREE T) {
 
 // 后序遍历访问某个结点时，该结点的所有先祖节点依次都在栈里，其他遍历方式不存在这种情况
 // 其他遍历方式也可以做
-int calc_bt_node_layer(BTREE T, CONST_STRING item) {
+int calc_bt_node_layer(BTREE T, STRING item) {
     STACK *stack = init_stack(sizeof(BTREE), 20);
     STACK *flags = init_stack(sizeof(_Bool), 20);
     _Bool flag = false;
@@ -288,7 +301,7 @@ int calc_bt_node_layer(BTREE T, CONST_STRING item) {
                 push_stack(flags, &TRUE);
                 p = p->r_child;
             } else {
-                if (p->data == item)
+                if (!strcmp(p->data, item))
                     return (int) stack->size + 1;
                 p = NULL;
             }
@@ -584,18 +597,19 @@ void post_order2(BTREE T, void visit(int, ...)) {
 BTREE recover_bt_by_pre_in_recur(STRING*pre_seq, STRING*in_seq, size_t seq_len) {
     if (seq_len == 0) {
         return NULL;
+    } else {
+
+        BTREE T = create_bt_node(*pre_seq);
+
+        size_t in_root_offset = linear_search_str(in_seq, T->data);
+
+        T->l_child = recover_bt_by_pre_in_recur(pre_seq + 1, in_seq, in_root_offset);
+
+        T->r_child = recover_bt_by_pre_in_recur(pre_seq + 1 + in_root_offset, in_seq + in_root_offset + 1,
+                                                (seq_len - 1) - in_root_offset);
+
+        return T;
     }
-
-    BTREE T = create_bt_node(*pre_seq);
-
-    size_t in_root_offset = linear_search_str(in_seq, T->data);
-
-    T->l_child = recover_bt_by_pre_in_recur(pre_seq + 1, in_seq, in_root_offset);
-
-    T->r_child = recover_bt_by_pre_in_recur(pre_seq + 1 + in_root_offset, in_seq + in_root_offset + 1,
-                                            (seq_len - 1) - in_root_offset);
-
-    return T;
 }
 
 // 转非递归的要素：1.是否满足递归终止条件  2.进递归前做了哪些事情  3.出递归做了哪些事情
@@ -735,16 +749,16 @@ void copy_bt2(BTREE T, BTREE *T2) {
     }
 }
 
-BTREE create_bst(CONST_STRING *keys) {
+BTREE create_bst(STRING*keys) {
     BTREE T = NULL;
     while (*keys != NULL) {
-        insert_bst_recur(&T, *keys);
+        insert_bst(&T, *keys);
         ++keys;
     }
     return T;
 }
 
-void insert_bst_recur(BTREE *T, CONST_STRING item) {
+void insert_bst_recur(BTREE *T, STRING item) {
     STRING str = NULL;
     if ((*T) == NULL) {
         (*T) = create_bt_node(item);
@@ -753,4 +767,111 @@ void insert_bst_recur(BTREE *T, CONST_STRING item) {
     } else {
         insert_bst_recur(&((*T)->r_child), item);
     }
+}
+
+// 减治非递归
+void insert_bst(BTREE *T, STRING item) {
+    BTREE p = NULL;
+    BTREE parent = NULL;
+    STRING str = NULL;
+    p = create_bt_node(item);
+    if (*T == NULL) {
+        *T = p;
+    } else {
+        parent = *T;
+        while (true) {
+            if (strtol(item, &str, 10) < strtol(parent->data, &str, 10)) {
+                if (parent->l_child != NULL) {
+                    parent = parent->l_child;
+                } else {
+                    parent->l_child = p;
+                    break;
+                }
+            } else {
+                if (parent->r_child != NULL) {
+                    parent = parent->r_child;
+                } else {
+                    parent->r_child = p;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void _delete_bst(BTREE *T, BTREE *p, BTREE parent) {
+    BTREE subs = NULL;
+    BTREE subs_parent = NULL;
+    if ((*p)->l_child != NULL && (*p)->r_child != NULL) {
+        subs_parent = *p;
+        subs = (*p)->r_child;
+        while (subs->l_child != NULL) {
+            subs_parent = subs;
+            subs = subs->l_child;
+        }
+        subs->l_child = (*p)->l_child;
+        if (subs_parent != *p) {
+            subs_parent->l_child = subs->r_child;
+            subs->r_child = (*p)->r_child;
+        }
+    } else {
+        if ((*p)->l_child == NULL) {
+            subs = (*p)->r_child;
+        } else if ((*p)->r_child == NULL) {
+            subs = (*p)->l_child;
+        }
+    }
+    if (parent != NULL) {
+        if (*p == parent->l_child)
+            parent->l_child = subs;
+        else if (*p == parent->r_child)
+            parent->r_child = subs;
+    } else {
+        *T = subs;
+    }
+    clear_bt_node(p);
+}
+
+void delete_bst(BTREE *T, STRING item) {
+    BTREE p = NULL;
+    BTREE parent = NULL;
+    STRING str = NULL;
+    p = *T;
+    while (p != NULL) {
+        if (strtol(item, &str, 10) < strtol(p->data, &str, 10)) {
+            parent = p;
+            p = p->l_child;
+        } else if (strtol(item, &str, 10) > strtol(p->data, &str, 10)) {
+            parent = p;
+            p = p->r_child;
+        } else {
+            _delete_bst(T, &p, parent);
+        }
+    }
+}
+
+BTREE search_bst_recur(BTREE T, STRING item) {
+    if (T == NULL) {
+        return NULL;
+    } else if (!str_num_cmp(T->data, item)) {
+        return T;
+    } else if (str_num_cmp(item, T->data) < 0) {
+        return search_bst_recur(T->l_child, item);
+    } else {
+        return search_bst_recur(T->r_child, item);
+    }
+}
+
+BTREE search_bst(BTREE T, STRING item) {
+    BTREE p = T;
+    while (p != NULL) {
+        if (!str_num_cmp(p->data, item)) {
+            return p;
+        } else if (str_num_cmp(item, p->data) < 0) {
+            p = p->l_child;
+        } else {
+            p = p->r_child;
+        }
+    }
+    return p;
 }

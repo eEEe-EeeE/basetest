@@ -13,18 +13,22 @@ typedef struct _bt_node {
     struct _bt_node *r_child;
 } BTNode, *BTREE;
 
-BTREE create_bt(CONST_STRING*words);
+BTREE create_bt(STRING*words);
 
-BTREE create_bt_node(CONST_STRING string);
+BTREE create_bt_node(STRING string);
 
 // 前序遍历建立二叉树
 void build_bt(BTREE *T);
 
 void destroy_bt(BTREE T);
 
+void destroy_bt_node(BTREE T);
+
 void clear_bt(BTREE *T);
 
-BTREE delete_bt(BTREE *T, CONST_STRING item);
+void clear_bt_node(BTREE *T);
+
+BTREE delete_bt(BTREE *T, STRING item);
 
 // 层序遍历打印结点
 void level_print_bt(BTREE T);
@@ -35,7 +39,7 @@ int count_bt_leaf_recur(BTREE T);
 int count_bt_leaf(BTREE T);
 
 // 计算结点的层级
-int calc_bt_node_layer(BTREE T, CONST_STRING item);
+int calc_bt_node_layer(BTREE T, STRING item);
 
 // 交换左右子树
 void exchange_bt(BTREE T);
@@ -103,9 +107,17 @@ BTREE copy_bt(BTREE T);
 void copy_bt2(BTREE T, BTREE *T2);
 
 //插入二叉排序树
-BTREE create_bst(CONST_STRING *keys);
+BTREE create_bst(STRING *keys);
 
-void insert_bst_recur(BTREE *T, CONST_STRING item);
+void insert_bst_recur(BTREE *T, STRING item);
+
+void insert_bst(BTREE *T, STRING item);
+
+void delete_bst(BTREE *T, STRING item);
+
+BTREE search_bst_recur(BTREE T, STRING item);
+
+BTREE search_bst(BTREE T, STRING item);
 
 
 #endif //BASETEST_BINARY_TREE_H

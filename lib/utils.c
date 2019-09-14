@@ -113,3 +113,8 @@ int linear_search_str(char **pString, char *string) {
     }
     return -1;
 }
+
+int str_num_cmp(STRING str1, STRING str2) {
+    STRING end = NULL;
+    return strtol(str1, &end, 10) - strtol(str2, &end, 10);
+}

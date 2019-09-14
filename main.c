@@ -27,30 +27,31 @@ int main() {
 //    level_print_bt(p);
 //    printf("\n");
 
-//    BTREE T = create_bt(words);
-//    level_print_bt(T);
+    BTREE T = create_bt(words);
+    level_print_bt(T);
 
 //    BTREE T = NULL;
 //    build_bt(&T);
 //    level_print_bt(T);
 
-    CONST_STRING keys[] = {
-            "5",
-            "10",
-            "5",
-            "20",
-            "17",
-            "12",
-            "19",
-            "2",
-            NULL
-    };
+//    STRING keys[] = {
+//            "5",
+//            "10",
+//            "5",
+//            "20",
+//            "17",
+//            "12",
+//            "19",
+//            "2",
+//            NULL
+//    };
+//
+//    BTREE T = create_bst(keys);
+//    in_order(T, (void (*)(int, ...)) print_bt_node);
+//    printf("\n");
+//    BTREE p = search_bst_recur(T, "19");
+//    printf("%s", p->data);
 
-    char **s = malloc(3);
-    const char **ss = s;
-
-    BTREE T = create_bst(keys);
-    in_order(T, (void (*)(int, ...)) print_bt_node);
 
     return 0;
 }
