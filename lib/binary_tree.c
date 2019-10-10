@@ -200,7 +200,7 @@ int count_bt_depth_pre(BTREE T) {
     while (!(p == NULL && stack_is_empty(stack))) {
         if (p != NULL) {
             ++cur_level;
-            if (bt_node_is_leaf(p) && cur_level > cur_max_level)
+            if (cur_level > cur_max_level)
                 cur_max_level = cur_level;
             push_stack(stack, &p);
             push_stack(level, &cur_level);
@@ -235,7 +235,7 @@ int count_bt_depth_in(BTREE T) {
         } else {
             pop_stack(stack, &p);
             pop_stack(level, &cur_level);
-            if (bt_node_is_leaf(p) && cur_level > cur_max_level)
+            if (cur_level > cur_max_level)
                 cur_max_level = cur_level;
             p = p->r_child;
         }

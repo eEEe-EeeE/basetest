@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 BBTREE create_bbt_node(STRING string) {
     if (string != NULL) {
         BBTREE pNode = malloc(sizeof(BBTNode));
@@ -17,7 +19,7 @@ BBTREE create_bbt_node(STRING string) {
                 strcpy(pNode->data, string);
                 pNode->l_child = NULL;
                 pNode->r_child = NULL;
-                pNode->balance = 0;
+                pNode->height = 1;
                 return pNode;
             }
         }
@@ -28,7 +30,7 @@ BBTREE create_bbt_node(STRING string) {
 BBTREE create_bbt(STRING *keys) {
     BBTREE T = NULL;
     while (*keys != NULL) {
-        insert_bbt(&T, *keys);
+        insert_bbt_recur(&T, *keys);
         ++keys;
     }
     return T;
@@ -52,6 +54,31 @@ void insert_bbt_recur(BBTREE *T, STRING item) {
     if (*T == NULL) {
         (*T) = create_bbt_node(item);
     } else if (strtol(item, NULL, 10) < strtol((*T)->data, NULL, 10)) {
-
+        insert_bbt_recur(&((*T)->l_child), item);
+    } else if (strtol(item, NULL, 10) < strtol((*T)->data, NULL, 10)) {
+        insert_bbt_recur(&((*T)->r_child), item);
     }
+
+    (*T)->height = MAX(count_bbt_height((*T)->l_child), count_bbt_height((*T)->r_child)) + 1;
+}
+
+int count_bbt_height(BBTREE T) {
+    if (T == NULL) {
+        return 0;
+    } else {
+        return T->height;
+    }
+}
+
+void single_rotate_with_left(BBTREE *T) {
+
+}
+void single_rotate_with_right(BBTREE *T) {
+
+}
+void double_rotate_with_left(BBTREE *T) {
+
+}
+void double_rotate_with_right(BBTREE *T) {
+
 }
