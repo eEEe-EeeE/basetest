@@ -8,45 +8,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-BBTREE create_bbt(STRING*words) {
-    STACK *stack = init_stack(sizeof(BBTREE), 10);
-    // 1: left 2: right
-    int flag = 0;
-    STRING*sp = words;
-    BBTREE T = NULL;
-    BBTREE p = NULL;
-    BBTREE parent = NULL;
-    while (sp != NULL) {
-        if (!strcmp("@", *sp)) {
-            del_stack(stack);
-            return T;
-        } else if (!strcmp("(", *sp)) {
-            push_stack(stack, &p);
-            flag = 1;
-        } else if (!strcmp(",", *sp)) {
-            flag = 2;
-        } else if (!strcmp(")", *sp)) {
-            pop_stack(stack, &p);
-        } else {
-            p = create_bbt_node(*sp);
-            if (T == NULL) {
-                T = p;
-            } else if (flag == 1) {
-                pop_stack(stack, &parent);
-                parent->l_child = p;
-                push_stack(stack, &parent);
-            } else if (flag == 2) {
-                pop_stack(stack, &parent);
-                parent->r_child = p;
-                push_stack(stack, &parent);
-            }
-        }
-        ++sp;
-    }
-    del_stack(stack);
-    return NULL;
-}
-
 BBTREE create_bbt_node(STRING string) {
     if (string != NULL) {
         BBTREE pNode = malloc(sizeof(BBTNode));
@@ -64,6 +25,15 @@ BBTREE create_bbt_node(STRING string) {
     return NULL;
 }
 
+BBTREE create_bbt(STRING *keys) {
+    BBTREE T = NULL;
+    while (*keys != NULL) {
+        insert_bbt(&T, *keys);
+        ++keys;
+    }
+    return T;
+}
+
 void destroy_bbt(BBTREE T) {
     if (T != NULL) {
         destroy_bbt(T->l_child);
@@ -76,4 +46,12 @@ void destroy_bbt(BBTREE T) {
 void clear_bbt(BBTREE *T) {
     destroy_bbt(*T);
     *T = NULL;
+}
+
+void insert_bbt_recur(BBTREE *T, STRING item) {
+    if (*T == NULL) {
+        (*T) = create_bbt_node(item);
+    } else if (strtol(item, NULL, 10) < strtol((*T)->data, NULL, 10)) {
+
+    }
 }

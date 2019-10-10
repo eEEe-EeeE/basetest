@@ -14,14 +14,16 @@ typedef struct _bbt_node {
     int balance;
 } BBTNode, *BBTREE;
 
-BBTREE create_bbt(STRING*words);
-
 BBTREE create_bbt_node(STRING string);
 
-void destroy_bbt_node(BBTREE pNode);
+BBTREE create_bbt(STRING *keys);
 
 void destroy_bbt(BBTREE T);
 
 void clear_bbt(BBTREE *T);
+
+void insert_bbt_recur(BBTREE *T, STRING item);
+
+void insert_bbt(BBTREE *T, STRING item);
 
 #endif //BASETEST_BALANCED_BINARY_TREE_H

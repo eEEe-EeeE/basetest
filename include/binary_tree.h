@@ -106,7 +106,7 @@ BTREE copy_bt(BTREE T);
 
 void copy_bt2(BTREE T, BTREE *T2);
 
-//插入二叉排序树
+//二叉排序树
 BTREE create_bst(STRING *keys);
 
 void insert_bst_recur(BTREE *T, STRING item);

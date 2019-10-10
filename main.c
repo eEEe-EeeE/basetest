@@ -27,8 +27,8 @@ int main() {
 //    level_print_bt(p);
 //    printf("\n");
 
-    BTREE T = create_bt(words);
-    level_print_bt(T);
+//    BTREE T = create_bt(words);
+//    level_print_bt(T);
 
 //    BTREE T = NULL;
 //    build_bt(&T);
