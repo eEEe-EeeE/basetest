@@ -27,8 +27,11 @@ void insert_bbt_recur(BBTREE *T, STRING item);
 int count_bbt_height(BBTREE T);
 
 void single_rotate_with_left(BBTREE *T);
+
 void single_rotate_with_right(BBTREE *T);
+
 void double_rotate_with_left(BBTREE *T);
+
 void double_rotate_with_right(BBTREE *T);
 
 #endif //BASETEST_BALANCED_BINARY_TREE_H
