@@ -4,6 +4,7 @@
 
 #include <binary_tree.h>
 #include <thread_binary_tree.h>
+#include <balanced_binary_tree.h>
 #include <utils.h>
 #include <stack.h>
 #include <queue.h>
@@ -27,30 +28,34 @@ int main() {
 //    level_print_bt(p);
 //    printf("\n");
 
-    BTREE T = create_bt(words);
-    printf("%d", count_bt_depth_in(T));
+//    BTREE T = create_bt(words);
+//    printf("%d", count_bt_depth_in(T));
 
 //    BTREE T = NULL;
 //    build_bt(&T);
 //    level_print_bt(T);
 
-//    STRING keys[] = {
-//            "5",
-//            "10",
-//            "5",
-//            "20",
-//            "17",
-//            "12",
-//            "19",
-//            "2",
-//            NULL
-//    };
+    STRING keys[] = {
+            "5",
+            "10",
+            "5",
+            "20",
+            "17",
+            "12",
+            "19",
+            "2",
+            NULL
+    };
 //
 //    BTREE T = create_bst(keys);
 //    in_order(T, (void (*)(int, ...)) print_bt_node);
 //    printf("\n");
 //    BTREE p = search_bst_recur(T, "19");
 //    printf("%s", p->data);
+    BBTREE T = create_bbt(keys);
+    printf("%d", count_bbt_height(T));
+    int a[] = {4, 8, 1, 3, 9, 4, 5};
+    quick_sort_i(a, 7);
 
 
     return 0;

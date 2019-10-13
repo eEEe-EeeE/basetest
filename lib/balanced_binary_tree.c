@@ -62,10 +62,10 @@ void insert_bbt_recur(BBTREE *T, STRING item) {
                 double_rotate_with_left(T);
             }
         }
-    } else if (strtol(item, NULL, 10) > strtol((*T)->data, NULL, 10)) {
+    } else {
         insert_bbt_recur(&((*T)->r_child), item);
         if (count_bbt_height((*T)->r_child) - count_bbt_height((*T)->l_child) == 2) {
-            if (strtol(item, NULL, 10) < strtol((*T)->l_child->data, NULL, 10)) {
+            if (strtol(item, NULL, 10) < strtol((*T)->r_child->data, NULL, 10)) {
                 double_rotate_with_right(T);
             } else {
                 single_rotate_with_right(T);

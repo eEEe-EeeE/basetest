@@ -62,9 +62,9 @@ int fact(int n) {
 /*
  * 质因数分解
  * @ n: 待分解的数
- * @ prime_factors: 输入的用于返回的质因数数组
- * @ len: 质数组长度
- * @ nums: 输入的用于返回的质因数的数目
+ * @ prime_factors: 用于返回质因数数组
+ * @ len: 数组长度
+ * @ nums: 用于返回质因数的数目
  */
 void decompose_prime_factor(int n, int *prime_factors, const int len, int *nums) {
     int merchant = n;
@@ -117,4 +117,38 @@ int linear_search_str(char **pString, char *string) {
 int str_num_cmp(STRING str1, STRING str2) {
     STRING end = NULL;
     return strtol(str1, &end, 10) - strtol(str2, &end, 10);
+}
+
+// 整数的快速排序
+void quick_sort_i(int *begin, size_t len) {
+    if (len > 1) {
+        int base_point = _qsort_partition(begin, len);
+        quick_sort_i(begin, base_point);
+        quick_sort_i(begin + base_point + 1, len - (base_point + 1));
+    }
+}
+
+int _qsort_partition(int *begin, size_t len) {
+    if (len > 1) {
+        int base_point = (int) len - 1;
+        int swap;
+        int last_small = -1;
+        int index = 0;
+        while (index != (int) len) {
+            if (begin[index] < begin[base_point]) {
+                swap = begin[++last_small];
+                begin[last_small] = begin[index];
+                begin[index] = swap;
+            }
+            ++index;
+        }
+        swap = begin[++last_small];
+        begin[last_small] = begin[base_point];
+        begin[base_point] = swap;
+        return last_small;
+    } else if (len == 1) {
+        return 0;
+    } else {
+        return -1;
+    }
 }

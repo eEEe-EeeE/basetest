@@ -18,4 +18,10 @@ add_executable(basetest
         lib/queue.c
         include/stack.h
         lib/stack.c
-        include/mydef.h include/thread_binary_tree.h lib/thread_binary_tree.c include/balanced_binary_tree.h lib/balanced_binary_tree.c)
+        include/mydef.h
+        include/thread_binary_tree.h
+        lib/thread_binary_tree.c
+        include/balanced_binary_tree.h
+        lib/balanced_binary_tree.c
+        include/huffman_tree.h
+        lib/huffman_tree.c)
