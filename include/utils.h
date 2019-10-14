@@ -26,7 +26,8 @@ int fact(int n);
 void decompose_prime_factor(int n, int *prime_factors, int len, int *nums);
 
 // 二分查找
-int binary_search_recur(void *arr, size_t len, size_t elem_size, int left, int right, void *key(void *));
+void *binary_search_recur(const void *key, const void *arr, size_t len, size_t elem_size,
+                          int (*)(const void *, const void *));
 
 // 线性查找
 int linear_search(void *arr, size_t len, size_t elem_size, void *key);
@@ -37,10 +38,10 @@ int linear_search_str(char **pString, char *string);
 // 字符串数字比较大小
 int str_num_cmp(STRING str1, STRING str2);
 
-// 整数的快速排序
-void quick_sort_i(int *begin, size_t len);
+// 整数的快速排序，通过另一个数组对该数组排序
+void qsort_by_arr(int *begin, size_t len, const void *_arr, int (*)(const void *, int, int));
 
-int _qsort_partition(int *begin, size_t len);
+int _qsort_partition(int *begin, size_t len, const void *_arr, int (*)(const void *, int, int));
 
 
 #endif //BASETEST_UTILS_H

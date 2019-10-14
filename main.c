@@ -5,6 +5,7 @@
 #include <binary_tree.h>
 #include <thread_binary_tree.h>
 #include <balanced_binary_tree.h>
+#include <huffman_tree.h>
 #include <utils.h>
 #include <stack.h>
 #include <queue.h>
@@ -52,11 +53,29 @@ int main() {
 //    printf("\n");
 //    BTREE p = search_bst_recur(T, "19");
 //    printf("%s", p->data);
-    BBTREE T = create_bbt(keys);
-    printf("%d", count_bbt_height(T));
-    int a[] = {4, 8, 1, 3, 9, 4, 5};
-    quick_sort_i(a, 7);
+    int w[] = {4, 2, 1, 2, 2, 1, 1, 1};
+    size_t len = sizeof(w) / sizeof(*w);
+    int *parent = NULL;
+    int *l_child = NULL;
+    int *r_child = NULL;
+    create_hfmt(w, len, &parent, &l_child, &r_child);
+    for (int i = 0; i < 2 * (int) len - 1; ++i) {
+        printf("%d, %d, %d, %d, %d\n", i, w[i], parent[i], l_child[i], r_child[i]);
+    }
 
+    printf("\n************************\n");
+    int *start = NULL;
+    char *code = NULL;
+    create_hfm_code(&code, &start, len, parent, l_child, r_child);
+    int i;
+    for (i = 0; i < (int) len; ++i) {
+        int j;
+        for (j = start[i]; j < (int) len; ++j) {
+            printf("%d ", code[i * len + j]);
+        }
+        if (i != len - 1)
+            printf("\n");
+    }
 
     return 0;
 }

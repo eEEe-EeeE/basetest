@@ -85,6 +85,10 @@ void decompose_prime_factor(int n, int *prime_factors, const int len, int *nums)
 /*
  * 二分搜索
  */
+void *binary_search_recur(const void *key, const void *arr, size_t len, size_t elem_size,
+                        int (*_PtFuncCompare)(const void *, const void *)) {
+    return NULL;
+}
 
 
 
@@ -120,22 +124,26 @@ int str_num_cmp(STRING str1, STRING str2) {
 }
 
 // 整数的快速排序
-void quick_sort_i(int *begin, size_t len) {
+void qsort_by_arr(int *begin, size_t len, const void *_arr,
+                  int (*_PtFuncCompare)(const void *, int, int)) {
     if (len > 1) {
-        int base_point = _qsort_partition(begin, len);
-        quick_sort_i(begin, base_point);
-        quick_sort_i(begin + base_point + 1, len - (base_point + 1));
+        int base_point = _qsort_partition(begin, len, _arr, _PtFuncCompare);
+        qsort_by_arr(begin, base_point, _arr, _PtFuncCompare);
+        qsort_by_arr(begin + base_point + 1, len - (base_point + 1), _arr, _PtFuncCompare);
     }
 }
 
-int _qsort_partition(int *begin, size_t len) {
+int _qsort_partition(int *begin, size_t len, const void *_arr,
+                     int (*_PtFuncCompare)(const void *, int, int)) {
     if (len > 1) {
         int base_point = (int) len - 1;
-        int swap;
         int last_small = -1;
         int index = 0;
+
+        int swap;
+
         while (index != (int) len) {
-            if (begin[index] < begin[base_point]) {
+            if (_PtFuncCompare(_arr, begin[index], begin[base_point]) < 0) {
                 swap = begin[++last_small];
                 begin[last_small] = begin[index];
                 begin[index] = swap;
