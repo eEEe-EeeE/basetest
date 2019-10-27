@@ -103,3 +103,5 @@ cmake-build-debug/_deps
 # custom
 cmake-build-debug/
 .idea/
+*.sublime-project
+*.sublime-workspace
