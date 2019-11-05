@@ -24,4 +24,4 @@ add_executable(basetest
         include/balanced_binary_tree.h
         lib/balanced_binary_tree.c
         include/huffman_tree.h
-        lib/huffman_tree.c)
+        lib/huffman_tree.c include/hash.h lib/hash.c)

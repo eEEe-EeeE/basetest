@@ -759,10 +759,9 @@ BTREE create_bst(STRING*keys) {
 }
 
 void insert_bst_recur(BTREE *T, STRING item) {
-    STRING str = NULL;
     if ((*T) == NULL) {
         (*T) = create_bt_node(item);
-    } else if (strtol(item, &str, 10) < strtol((*T)->data, &str, 10)) {
+    } else if (strtol(item, NULL, 10) < strtol((*T)->data, NULL, 10)) {
         insert_bst_recur(&((*T)->l_child), item);
     } else {
         insert_bst_recur(&((*T)->r_child), item);
@@ -773,14 +772,13 @@ void insert_bst_recur(BTREE *T, STRING item) {
 void insert_bst(BTREE *T, STRING item) {
     BTREE p = NULL;
     BTREE parent = NULL;
-    STRING str = NULL;
     p = create_bt_node(item);
     if (*T == NULL) {
         *T = p;
     } else {
         parent = *T;
         while (true) {
-            if (strtol(item, &str, 10) < strtol(parent->data, &str, 10)) {
+            if (strtol(item, NULL, 10) < strtol(parent->data, NULL, 10)) {
                 if (parent->l_child != NULL) {
                     parent = parent->l_child;
                 } else {
@@ -835,13 +833,12 @@ void _delete_bst(BTREE *T, BTREE *p, BTREE parent) {
 void delete_bst(BTREE *T, STRING item) {
     BTREE p = NULL;
     BTREE parent = NULL;
-    STRING str = NULL;
     p = *T;
     while (p != NULL) {
-        if (strtol(item, &str, 10) < strtol(p->data, &str, 10)) {
+        if (strtol(item, NULL, 10) < strtol(p->data, NULL, 10)) {
             parent = p;
             p = p->l_child;
-        } else if (strtol(item, &str, 10) > strtol(p->data, &str, 10)) {
+        } else if (strtol(item, NULL, 10) > strtol(p->data, NULL, 10)) {
             parent = p;
             p = p->r_child;
         } else {

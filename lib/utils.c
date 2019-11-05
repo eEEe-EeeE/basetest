@@ -119,8 +119,7 @@ int linear_search_str(char **pString, char *string) {
 }
 
 int str_num_cmp(STRING str1, STRING str2) {
-    STRING end = NULL;
-    return strtol(str1, &end, 10) - strtol(str2, &end, 10);
+    return strtol(str1, NULL, 10) - strtol(str2, NULL, 10);
 }
 
 // 整数的快速排序
