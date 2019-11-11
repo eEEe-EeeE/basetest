@@ -10,9 +10,9 @@
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-BBTREE create_bbt_node(STRING string) {
+BBTree _create_bbt_node(STRING string) {
     if (string != NULL) {
-        BBTREE pNode = malloc(sizeof(BBTNode));
+        BBTree pNode = malloc(sizeof(BBTNode));
         if (pNode != NULL) {
             pNode->data = malloc(strlen(string) + 1);
             if (pNode->data != NULL) {
@@ -27,8 +27,8 @@ BBTREE create_bbt_node(STRING string) {
     return NULL;
 }
 
-BBTREE create_bbt(STRING*keys) {
-    BBTREE T = NULL;
+BBTree create_bbt(STRING*keys) {
+    BBTree T = NULL;
     while (*keys != NULL) {
         insert_bbt_recur(&T, *keys);
         ++keys;
@@ -36,7 +36,7 @@ BBTREE create_bbt(STRING*keys) {
     return T;
 }
 
-void destroy_bbt(BBTREE T) {
+void destroy_bbt(BBTree T) {
     if (T != NULL) {
         destroy_bbt(T->l_child);
         destroy_bbt(T->r_child);
@@ -45,14 +45,14 @@ void destroy_bbt(BBTREE T) {
     }
 }
 
-void clear_bbt(BBTREE *T) {
+void clear_bbt(BBTree *T) {
     destroy_bbt(*T);
     *T = NULL;
 }
 
-void insert_bbt_recur(BBTREE *T, STRING item) {
+void insert_bbt_recur(BBTree *T, STRING item) {
     if (*T == NULL) {
-        (*T) = create_bbt_node(item);
+        (*T) = _create_bbt_node(item);
     } else if (strtol(item, NULL, 10) < strtol((*T)->data, NULL, 10)) {
         insert_bbt_recur(&((*T)->l_child), item);
         if (count_bbt_height((*T)->l_child) - count_bbt_height((*T)->r_child) == 2) {
@@ -75,7 +75,7 @@ void insert_bbt_recur(BBTREE *T, STRING item) {
     (*T)->height = MAX(count_bbt_height((*T)->l_child), count_bbt_height((*T)->r_child)) + 1;
 }
 
-int count_bbt_height(BBTREE T) {
+int count_bbt_height(BBTree T) {
     if (T == NULL) {
         return 0;
     } else {
@@ -83,8 +83,8 @@ int count_bbt_height(BBTREE T) {
     }
 }
 
-void single_rotate_with_left(BBTREE *T) {
-    BBTREE p = *T;
+void single_rotate_with_left(BBTree *T) {
+    BBTree p = *T;
     *T = p->l_child;
     p->l_child = (*T)->r_child;
     (*T)->r_child = p;
@@ -92,8 +92,8 @@ void single_rotate_with_left(BBTREE *T) {
     (*T)->height = MAX(count_bbt_height((*T)->l_child), count_bbt_height((*T)->r_child)) + 1;
 }
 
-void single_rotate_with_right(BBTREE *T) {
-    BBTREE p = *T;
+void single_rotate_with_right(BBTree *T) {
+    BBTree p = *T;
     *T = p->r_child;
     p->r_child = (*T)->l_child;
     (*T)->l_child = p;
@@ -101,12 +101,12 @@ void single_rotate_with_right(BBTREE *T) {
     (*T)->height = MAX(count_bbt_height((*T)->l_child), count_bbt_height((*T)->r_child)) + 1;
 }
 
-void double_rotate_with_left(BBTREE *T) {
+void double_rotate_with_left(BBTree *T) {
     single_rotate_with_right(&((*T)->l_child));
     single_rotate_with_left(T);
 }
 
-void double_rotate_with_right(BBTREE *T) {
+void double_rotate_with_right(BBTree *T) {
     single_rotate_with_left(&((*T)->r_child));
     single_rotate_with_right(T);
 }

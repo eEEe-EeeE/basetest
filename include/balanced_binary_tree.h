@@ -12,26 +12,26 @@ typedef struct _bbt_node {
     struct _bbt_node *l_child;
     struct _bbt_node *r_child;
     int height;
-} BBTNode, *BBTREE;
+} BBTNode, *BBTree;
 
-BBTREE create_bbt_node(STRING string);
+BBTree _create_bbt_node(STRING string);
 
-BBTREE create_bbt(STRING *keys);
+BBTree create_bbt(STRING *keys);
 
-void destroy_bbt(BBTREE T);
+void destroy_bbt(BBTree T);
 
-void clear_bbt(BBTREE *T);
+void clear_bbt(BBTree *T);
 
-void insert_bbt_recur(BBTREE *T, STRING item);
+void insert_bbt_recur(BBTree *T, STRING item);
 
-int count_bbt_height(BBTREE T);
+int count_bbt_height(BBTree T);
 
-void single_rotate_with_left(BBTREE *T);
+void single_rotate_with_left(BBTree *T);
 
-void single_rotate_with_right(BBTREE *T);
+void single_rotate_with_right(BBTree *T);
 
-void double_rotate_with_left(BBTREE *T);
+void double_rotate_with_left(BBTree *T);
 
-void double_rotate_with_right(BBTREE *T);
+void double_rotate_with_right(BBTree *T);
 
 #endif //BASETEST_BALANCED_BINARY_TREE_H

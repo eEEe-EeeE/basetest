@@ -12,11 +12,11 @@
 
 #define MAXSIZE 100
 
-TBTREE create_tbt(STRING*words) {
-    STACK *stack = init_stack(sizeof(TBTREE), 10);
-    TBTREE p = NULL;
-    TBTREE parent = NULL;
-    TBTREE T = NULL;
+TBTree create_tbt(STRING*words) {
+    STACK *stack = init_stack(sizeof(TBTree), 10);
+    TBTree p = NULL;
+    TBTree parent = NULL;
+    TBTree T = NULL;
     int flag = 0;
     STRING*sp = words;
     while (sp != NULL) {
@@ -51,9 +51,9 @@ TBTREE create_tbt(STRING*words) {
 }
 
 
-TBTREE create_tbt_node(STRING string) {
+TBTree create_tbt_node(STRING string) {
     if (string != NULL) {
-        TBTREE pNode = (TBTREE) malloc(sizeof(TBTNode));
+        TBTree pNode = (TBTree) malloc(sizeof(TBTNode));
         if (pNode != NULL) {
             pNode->data = (STRING) malloc(strlen(string) + 1);
             if (pNode->data != NULL) {
@@ -69,7 +69,7 @@ TBTREE create_tbt_node(STRING string) {
     return NULL;
 }
 
-void _in_thread(TBTREE HEAD, TBTREE *prior) {
+void _in_thread(TBTree HEAD, TBTree *prior) {
     if (HEAD != NULL) {
         _in_thread(HEAD->l_child, prior);
         if (HEAD->l_child == NULL) {
@@ -87,20 +87,20 @@ void _in_thread(TBTREE HEAD, TBTREE *prior) {
     }
 }
 
-void in_thread(TBTREE *HEAD) {
-    TBTREE temp = create_tbt_node("HEAD");
+void in_thread(TBTree *HEAD) {
+    TBTree temp = create_tbt_node("HEAD");
     if (temp != NULL) {
         temp->l_child = *HEAD;
         *HEAD = temp;
-        TBTREE prior = *HEAD;
+        TBTree prior = *HEAD;
         _in_thread(*HEAD, &prior);
         (*HEAD)->r_child = *HEAD;
         (*HEAD)->r_bit = 1;
     }
 }
 
-TBTREE in_prior(TBTREE p) {
-    TBTREE s;
+TBTree in_prior(TBTree p) {
+    TBTree s;
     s = p->l_child;
     if (p->l_bit != 0) {
         while (s->r_bit != 0)
@@ -109,8 +109,8 @@ TBTREE in_prior(TBTREE p) {
     return s;
 }
 
-TBTREE in_succ(TBTREE p) {
-    TBTREE s;
+TBTree in_succ(TBTree p) {
+    TBTree s;
     s = p->r_child;
     if (p->r_bit != 0) {
         while (s->l_bit != 0)
@@ -119,8 +119,8 @@ TBTREE in_succ(TBTREE p) {
     return s;
 }
 
-void thr_in_order(TBTREE HEAD) {
-    TBTREE p = HEAD;
+void thr_in_order(TBTree HEAD) {
+    TBTree p = HEAD;
     while (1) {
         p = in_succ(p);
         if (p == HEAD)

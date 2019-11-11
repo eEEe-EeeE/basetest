@@ -13,20 +13,20 @@ typedef struct _thr_bt_node {
     struct _thr_bt_node *r_child;
     int l_bit;
     int r_bit;
-} TBTNode, *TBTREE;
+} TBTNode, *TBTree;
 
 
-TBTREE create_tbt(STRING*words);
+TBTree create_tbt(STRING*words);
 
-TBTREE create_tbt_node(STRING string);
+TBTree create_tbt_node(STRING string);
 
-void in_thread(TBTREE *HEAD);
+void in_thread(TBTree *HEAD);
 
-TBTREE in_prior(TBTREE p);
+TBTree in_prior(TBTree p);
 
-TBTREE in_succ(TBTREE p);
+TBTree in_succ(TBTree p);
 
-void thr_in_order(TBTREE HEAD);
+void thr_in_order(TBTree HEAD);
 
 
 #endif //BASETEST_THREAD_BINARY_TREE_H
