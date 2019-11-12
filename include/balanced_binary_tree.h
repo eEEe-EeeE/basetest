@@ -24,7 +24,7 @@ void clear_bbt(BBTree *T);
 
 void insert_bbt_recur(BBTree *T, STRING item);
 
-int count_bbt_height(BBTree T);
+int count_height_bbt(BBTree T);
 
 void single_rotate_with_left(BBTree *T);
 

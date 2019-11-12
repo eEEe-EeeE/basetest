@@ -11,7 +11,6 @@ typedef struct _st_node {
     int key;
     struct _st_node *left;
     struct _st_node *right;
-    int height;
 } STNode, *STree, *STNodePtr;
 
 void create_st(int *keys, size_t len);
@@ -22,8 +21,12 @@ STree delete_st_recur(STree T, int key);
 
 STNodePtr search_st_recur(STree T, int key);
 
-STree zig_zag_st(STree T);
+STree zig_st(STree T);
 
-STree zig_zig_st(STree T);
+STree zag_st(STree T);
+
+STNodePtr _min_value_st(STree T);
+
+STree _splay(STree T, int key);
 
 #endif //BASETEST_SPLAY_TREE_H

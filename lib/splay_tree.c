@@ -10,7 +10,7 @@
 void create_st(int *keys, size_t len) {
     int cnt = 0;
     STree T = NULL;
-    while(cnt < len) {
+    while (cnt < len) {
         T = insert_st_recur(T, keys[cnt]);
         ++cnt;
     }
@@ -22,7 +22,6 @@ STNodePtr _create_st_node(int key) {
         p->key = key;
         p->left = NULL;
         p->right = NULL;
-        p->height = 1;
     }
     return p;
 }
@@ -37,7 +36,6 @@ STree insert_st_recur(STree T, int key) {
     } else if (key > T->key) {
         T->right = insert_st_recur(T->right, key);
     }
-    T->height = MAX(T->left->height, T->right->height) + 1;
     return T;
 }
 
@@ -75,23 +73,56 @@ STree delete_st_recur(STree T, int key) {
     return T;
 }
 
-STNodePtr search_st_recur(STree T, int key) {
-    if (T != NULL) {
-        if (key < T->key) {
-            return search_st_recur(T->left, key);
-        } else if (key > T->key) {
-            return search_st_recur(T->right, key);
-        } else {
-
+// 伸展包含6种操作，目的是把访问结点移动到根结点
+STree _splay(STree T, int key) {
+    if (T == NULL || key == T->key) {
+        return T;
+    } else if (key < T->key) {
+        if (T->left != NULL) {
+            if (key < T->left->key) {
+                T->left->left = _splay(T->left->left, key);
+                T = zig_st(T);
+            } else if (key > T->left->key){
+                T->left->right = _splay(T->left->right, key);
+                if (T->left->right != NULL) {
+                    T->left = zag_st(T->left);
+                }
+            }
         }
+        return T->left != NULL ? zig_st(T) : T;
+    } else {
+        if (T->right != NULL) {
+            if (key > T->right->key) {
+                T->right->right = _splay(T->right->right, key);
+                T = zag_st(T);
+            } else if (key < T->right->key) {
+                T->right->left = _splay(T->right->left, key);
+                if (T->right->left != NULL) {
+                    T->right = zig_st(T->right);
+                }
+            }
+        }
+        return T->right != NULL ? zag_st(T) : T;
     }
-    return T;
 }
 
-STree zig_zag_st(STree T) {
-    return NULL;
+STNodePtr search_st_recur(STree T, int key) {
+    return _splay(T, key);
 }
 
-STree zig_zig_st(STree T) {
-    return NULL;
+// 右旋，空树会出错
+STree zig_st(STree T) {
+    STree temp = T->left;
+    T->left = temp->right;
+    temp->right = T;
+    return temp;
 }
+
+// 左旋，空树会出错
+STree zag_st(STree T) {
+    STree temp = T->right;
+    T->right = temp->left;
+    temp->left = T;
+    return temp;
+}
+
