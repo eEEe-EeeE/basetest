@@ -7,6 +7,8 @@
 #include <string.h>
 #include <utils.h>
 
+// 输入: weight, len
+// 输出: parent, l_child, r_child
 void create_hfmt(int *weight, size_t len, int **parent, int **l_child, int **r_child) {
     // @n : haffuman树结点数目
     int n = 2 * (int) len - 1;
@@ -57,7 +59,12 @@ void clear_hfmt(int **parent, int **l_child, int **r_child) {
     *r_child = NULL;
 }
 
-void create_hfm_code(char **code, int **start, size_t len, const int *parent, const int *l_child, const int *r_child) {
+// code: 编码矩阵
+// start: 编码矩阵编码起始位置
+// len: 矩阵宽度
+// 输入: parent, l_child, r_child
+// 输出: code, start, len
+void create_hfm_code(const int *parent, const int *l_child, const int *r_child, char **code, int **start, size_t len) {
     *code = (char *) malloc(len * len * sizeof(char));
     *start = (int *) malloc(len * sizeof(int));
 

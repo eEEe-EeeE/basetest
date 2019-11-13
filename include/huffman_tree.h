@@ -13,7 +13,7 @@ int _compareWeight(const void *_arr, int i1, int i2);
 
 void clear_hfmt(int **parent, int **l_child, int **r_child);
 
-void create_hfm_code(char **code, int **start, size_t len, const int *parent, const int *l_child, const int *r_child);
+void create_hfm_code(const int *parent, const int *l_child, const int *r_child, char **code, int **start, size_t len);
 
 void clear_hfm_code(char **code, int **start);
 

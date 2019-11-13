@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include <binary_tree.h>
 #include <binary_search_tree.h>
@@ -11,33 +12,29 @@
 #include <stack.h>
 #include <queue.h>
 
+#define MAXVALUE INT_MAX
+#define MAXVNUM 100
+
+typedef struct edge {
+    int adjvex;
+    int weight;
+    struct edge *next;
+} ELink;
+
+typedef struct ver {
+    int vertex;
+    ELink *link;
+} VLink;
+
+
+void adj_matrix(int A[][MAXVNUM], int n , int e);
+void adj_list(VLink G[], int n, int e);
 
 int main() {
 
-    //"A(B(D,E(G)),C(F(,H)))@";
+//    "A(B(D,E(G)),C(F(,H)))@";
 //    char *words[] = {"A", "(", "B", "(", "D", ",", "E", "(", "G", ")", ")", ",", "C", "(", "F", "(", ",", "H", ")",
 //                     ")", ")", "@", NULL};
-//
-//    char *pre[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", NULL};
-//    char *in[] = {"B", "C", "A", "E", "D", "G", "H", "F", "I", NULL};
-//    BTree p = recover_bt_by_pre_in(pre, in, 9);
-//    pre_order_recur(p, (void (*)(int, ...)) print_bt_node);
-//    printf("\n");
-//    pre_order(p, (void (*)(int, ...)) print_bt_node);
-//    printf("\n");
-//    post_order_recur(p, (void (*)(int, ...)) print_bt_node);
-//    printf("\n");
-//    level_print_bt(p);
-//    printf("\n");
-
-//    BTree T = create_bt(words);
-//    printf("%d\n", count_bt_leaf_recur(T));
-//    printf("%d\n", count_bt_leaf(T));
-//    printf("%d", count_bt_depth_in(T));
-
-//    BTree T = NULL;
-//    build_bt(&T);
-//    level_print_bt(T);
 
     int keys[] = {
             5,
@@ -49,39 +46,38 @@ int main() {
             19,
             2
     };
-    BSTree p = create_bst(keys, sizeof(keys) / sizeof(keys[0]));
-    delete_bst(p, 5);
-//
-//    BTree T = create_bst(keys);
-//    in_order(T, (void (*)(int, ...)) print_bt_node);
-//    printf("\n");
-//    BTree p = search_bst(T, "19");
-//    printf("%s", p->data);
 
-
-//    int w[] = {4, 2, 1, 2, 2, 1, 1, 1};
-//    size_t len = sizeof(w) / sizeof(*w);
-//    int *parent = NULL;
-//    int *l_child = NULL;
-//    int *r_child = NULL;
-//    create_hfmt(w, len, &parent, &l_child, &r_child);
-//    for (int i = 0; i < 2 * (int) len - 1; ++i) {
-//        printf("%d, %d, %d, %d, %d\n", i, w[i], parent[i], l_child[i], r_child[i]);
-//    }
-//
-//    printf("\n************************\n");
-//    int *start = NULL;
-//    char *code = NULL;
-//    create_hfm_code(&code, &start, len, parent, l_child, r_child);
-//    int i;
-//    for (i = 0; i < (int) len; ++i) {
-//        int j;
-//        for (j = start[i]; j < (int) len; ++j) {
-//            printf("%d ", code[i * len + j]);
-//        }
-//        if (i != len - 1)
-//            printf("\n");
-//    }
 
     return 0;
+}
+
+void adj_matrix(int A[][MAXVNUM], int n, int e) {
+    printf("input vertex num: \n");
+    scanf("%d", &n);
+    printf("input edge num: \n");
+    scanf("%d", &e);
+
+    int i, j, k, weight;
+
+    for (i = 0; i < n; ++i) {
+        for (j = 0; j < n; ++j) {
+            A[i][j] = MAXVALUE;
+        }
+    }
+
+    for (k = 0; k < n; ++k) {
+        printf("i = ");
+        scanf("%d", &i);
+        printf("j = ");
+        scanf("%d", &j);
+        printf("weight = ");
+        scanf("%d", &weight);
+        printf("\n");
+        A[i][j] = weight;
+        A[j][i] = weight;
+    }
+}
+
+void adj_list(VLink G[], int n, int e) {
+
 }
