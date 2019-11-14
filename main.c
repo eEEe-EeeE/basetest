@@ -15,20 +15,20 @@
 #define MAXVALUE INT_MAX
 #define MAXVNUM 100
 
-typedef struct edge {
+typedef struct _edge {
     int adjvex;
     int weight;
-    struct edge *next;
-} ELink;
+    struct _edge *next;
+} ENode, *ELink;
 
-typedef struct ver {
-    int vertex;
-    ELink *link;
-} VLink;
+typedef struct _vertex {
+    int data;
+    ELink link;
+} VNode, *VLink;
 
 
 void adj_matrix(int A[][MAXVNUM], int n , int e);
-void adj_list(VLink G[], int n, int e);
+void adj_list(VNode G[], int n, int e);
 
 int main() {
 
@@ -52,11 +52,6 @@ int main() {
 }
 
 void adj_matrix(int A[][MAXVNUM], int n, int e) {
-    printf("input vertex num: \n");
-    scanf("%d", &n);
-    printf("input edge num: \n");
-    scanf("%d", &e);
-
     int i, j, k, weight;
 
     for (i = 0; i < n; ++i) {
@@ -78,6 +73,29 @@ void adj_matrix(int A[][MAXVNUM], int n, int e) {
     }
 }
 
-void adj_list(VLink G[], int n, int e) {
+void adj_list(VNode G[], int n, int e) {
+    int i, j, k, weight;
+    for (i = 0; i < n; ++i) {
+        G[i].data = i + 1;
+        G[i].link = NULL;
+    }
 
+    for (k = 0; k < e; ++k) {
+        ELink p = (ELink) malloc(sizeof(ENode));
+        if (p != NULL) {
+            scanf("%d %d %d", &i, &j, &weight);
+            p->adjvex = j - 1;
+            p->weight = weight;
+            p->next = NULL;
+            if (G[i - 1].link == NULL) {
+                G[i - 1].link = p;
+            } else {
+                ELink q = G[i - 1].link;
+                while (q->next) {
+                    q = q->next;
+                }
+                q->next = p;
+            }
+        }
+    }
 }
