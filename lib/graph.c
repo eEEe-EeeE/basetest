@@ -6,27 +6,43 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define MAXVALUE INT_MAX
-#define MAXVNUM 100
+#include <queue.h>
 
-VLink init_undirected_graph(int n, int e) {
+
+VLink init_undirected_graph(int n, int e, int isWeighted) {
     VLink G = (VLink) malloc(sizeof(VNode) * n);
     if (G != NULL) {
-        undirected_adj_list(G, n, e);
+        undirected_adj_list(G, n, e, isWeighted);
     }
     return G;
 }
 
-VLink init_directed_graph(int n, int e) {
+VLink init_directed_graph(int n, int e, int isWeighted) {
     VLink G = (VLink) malloc(sizeof(VNode) * n);
     if (G != NULL) {
-        directed_adj_list(G, n, e);
+        directed_adj_list(G, n, e, isWeighted);
     }
     return G;
 }
 
-void undirected_adj_list(VLink G, int n, int e) {
+void clr_graph(VLink G, int n) {
+    int index = 0;
+    ELink ep = NULL;
+    ELink delPtr = NULL;
+    while (index < n) {
+        ep = G[index].link;
+        while (ep != NULL) {
+            delPtr = ep;
+            ep = ep->next;
+            free(delPtr);
+        }
+        ++index;
+    }
+}
+
+void undirected_adj_list(VLink G, int n, int e, int isWeighted) {
     int i;
     for (i = 0; i < n; ++i) {
         G[i].key = i + 1;
@@ -41,16 +57,17 @@ void undirected_adj_list(VLink G, int n, int e) {
         iPtr = (ELink) malloc(sizeof(ENode));
         jPtr = (ELink) malloc(sizeof(ENode));
         if (iPtr != NULL && jPtr != NULL) {
-            printf("%d edge\n", k);
-            printf("iNode: ");
-            scanf("%d", &vi);
-            printf("jNode: ");
-            scanf("%d", &vj);
-            printf("Weight: ");
-            scanf("%d", &weight);
+            if (isWeighted) {
+                printf("%d edge -- iNode, jNode, weight:\n", k);
+                scanf("%d %d %d", &vi, &vj, &weight);
+                iPtr->weight = jPtr->weight = weight;
+            } else {
+                printf("%d edge -- iNode, jNode:\n", k);
+                scanf("%d %d", &vi, &vj);
+                iPtr->weight = jPtr->weight = 1;
+            }
             iPtr->adjvex = vj - 1;
             jPtr->adjvex = vi - 1;
-            iPtr->weight = jPtr->weight = weight;
             iPtr->next = jPtr->next = NULL;
 
             p = G[vi - 1].link;
@@ -76,7 +93,7 @@ void undirected_adj_list(VLink G, int n, int e) {
     }
 }
 
-void directed_adj_list(VLink G, int n, int e) {
+void directed_adj_list(VLink G, int n, int e, int isWeighted) {
     int index;
     for (index = 0; index < n; ++index) {
         G[index].key = index + 1;
@@ -89,15 +106,16 @@ void directed_adj_list(VLink G, int n, int e) {
     for (k = 0; k < e; ++k) {
         ePtr = (ELink) malloc(sizeof(ENode));
         if (ePtr != NULL) {
-            printf("%d edge\n");
-            printf("tail: ");
-            scanf("%d", &vt);
-            printf("head: ");
-            scanf("%d", &vh);
-            printf("weight: ");
-            scanf("%d", &weight);
+            if (isWeighted) {
+                printf("%d edge -- tail, head, weight:\n", k);
+                scanf("%d %d %d", &vt, &vh, &weight);
+                ePtr->weight = weight;
+            } else {
+                printf("%d edge -- tail, head:\n", k);
+                scanf("%d %d", &vt, &vh);
+                ePtr->weight = 1;
+            }
             ePtr->adjvex = vh - 1;
-            ePtr->weight = weight;
             ePtr->next = NULL;
 
             p = G[vt - 1].link;
@@ -110,28 +128,6 @@ void directed_adj_list(VLink G, int n, int e) {
                 G[vt - 1].link = ePtr;
             }
         }
-    }
-}
-
-void adj_matrix(int A[][MAXVNUM], int n, int e) {
-    int i, j, k, weight;
-
-    for (i = 0; i < n; ++i) {
-        for (j = 0; j < n; ++j) {
-            A[i][j] = MAXVALUE;
-        }
-    }
-
-    for (k = 0; k < n; ++k) {
-        printf("i = ");
-        scanf("%d", &i);
-        printf("j = ");
-        scanf("%d", &j);
-        printf("weight = ");
-        scanf("%d", &weight);
-        printf("\n");
-        A[i][j] = weight;
-        A[j][i] = weight;
     }
 }
 
@@ -210,4 +206,80 @@ void delver(VLink G, int n, int key) {
             G[i - 1].link = G[i].link;
         }
     }
+}
+
+
+void travel_dfs(VLink G, int n) {
+    int *visited = (int *) malloc(sizeof(int) * n);
+    memset(visited, 0, sizeof(int) * n);
+    int i;
+    for (i = 0; i < n; ++i) {
+        if (visited[i] == 0) {
+            _dfs(G, i, visited);
+        }
+    }
+    free(visited);
+}
+
+void _dfs(VLink G, int vIndex, int *visited) {
+    // 访问结点
+    printf("vertex key: %d\n", G[vIndex].key);
+
+    // 访问完，访问标记置1
+    visited[vIndex] = 1;
+
+    ELink ePtr = G[vIndex].link;
+    while (ePtr != NULL) {
+        if (visited[ePtr->adjvex] == 0) {
+            _dfs(G, ePtr->adjvex, visited);
+        }
+        ePtr = ePtr->next;
+    }
+}
+
+void travel_bfs(VLink G, int n) {
+    int *visited = (int *) malloc(sizeof(int) * n);
+    memset(visited, 0, sizeof(int) * n);
+    int i;
+    for (i = 0; i < n; ++i) {
+        if (visited[i] == 0) {
+            _bfs(G, i, visited);
+        }
+    }
+    free(visited);
+}
+
+void _bfs(VLink G, int vIndex, int *visited) {
+    // 访问结点
+    printf("vertex key: %d\n", G[vIndex].key);
+
+    // 访问完，访问标记置1
+    visited[vIndex] = 1;
+
+    QUEUE *queue = init_queue(sizeof(int), 20);
+    push_queue(queue, &vIndex);
+    int vi = -1;
+    ELink ePtr = NULL;
+    while (!queue_is_empty(queue)) {
+        pop_queue(queue, &vi);
+        ePtr = G[vi].link;
+        while (ePtr != NULL) {
+            // 访问结点的所有邻接结点
+            if (visited[ePtr->adjvex] == 0) {
+                printf("vertex key: %d\n", G[ePtr->adjvex].key);
+
+                push_queue(queue, &(ePtr->adjvex));
+                visited[ePtr->adjvex] = 1;
+            }
+            ePtr = ePtr->next;
+        }
+    }
+}
+
+TREE min_span_prim(VLink G, int n) {
+
+}
+
+TREE min_span_kruskal(VLink G, int n) {
+
 }

@@ -7,53 +7,35 @@
 
 #include <stdbool.h>
 
-#define MaxTreeD 100
-
 // 无限子节点的表示
-typedef struct _bt_node {
-    int data;
-    struct _bt_node *child, *parent, *brother;
-} TTREE;
-
-// 有限子节点的表示
-
-// 定长
-typedef struct node1 {
-    int data;
-    struct node1 *child[MaxTreeD];
-} DTREE;
-
-// 不定长
-typedef struct node2 {
-    int data;
-    int degree; // 节点的度
-    struct node2 *child[MaxTreeD];
-} NTREE;
-
+typedef struct _tree_node {
+    int key;
+    struct _tree_node *child, *parent, *brother;
+} TREE;
 
 /* 建立一棵空树 */
-void setnull(TTREE *T);
+void setnull(TREE *T);
 
 /* 求节点x所在树的根节点 */
-TTREE *root(TTREE *x);
+TREE *root(TREE *x);
 
 /* 求树中节点x的父节点 */
-TTREE *parent(TTREE *T, TTREE *x);
+TREE *parent(TREE *T, TREE *x);
 
 /* 求树中节点x的子节点 */
-TTREE *child(TTREE *T, TTREE *x);
+TREE *child(TREE *T, TREE *x);
 
 /* 求树中节点x的右边的兄弟节点 */
-TTREE *rightsibling(TTREE *T, TTREE *x);
+TREE *rightsibling(TREE *T, TREE *x);
 
 /* 把以S为根节点的树插入到树T中作为x节点的第i棵子树 */
-bool insert(TTREE *T, TTREE *x, int i, TTREE *S);
+bool insert(TREE *T, TREE *x, int i, TREE *S);
 
 /* 删除树中节点x的第i棵子树 */
-bool delete(TTREE *T, TTREE *x, int i);
+bool delete(TREE *T, TREE *x, int i);
 
 /*  遍历一棵树，得到一个由所有节点组成的序列，每个节点只被访问一次 */
-TTREE *traverse(TTREE *T);
+TREE *traverse(TREE *T);
 
 
 #endif //BASETEST_TREE_H

@@ -51,22 +51,39 @@ typedef struct _multi_vertex {
     MELink link;
 } MVNode, MVLink;
 
-VLink init_undirected_graph(int n, int e);
 
-VLink init_directed_graph(int n, int e);
+// 初始化图顶点结点
+VLink init_undirected_graph(int n, int e, int isWeighted);
 
-void del_undirected_graph(VLink G);
+VLink init_directed_graph(int n, int e, int isWeighted);
 
-void del_directed_graph(VLink G);
+// 销毁图
+void clr_graph(VLink G, int n);
 
-void undirected_adj_list(VLink G, int n, int e);
+// 建立邻接表
 
-void directed_adj_list(VLink G, int n, int e);
+void undirected_adj_list(VLink G, int n, int e, int isWeighted);
 
-void adj_matrix(int A[][100], int n, int e);
+void directed_adj_list(VLink G, int n, int e, int isWeighted);
 
+// 删除结点
 void delver(VLink G, int n, int key);
 
+// 深度遍历 打印结点
+void travel_dfs(VLink G, int n);
+
+void _dfs(VLink G, int vIndex, int *visited);
+
+// 广度遍历 打印结点
+void travel_bfs(VLink G, int n);
+
+void _bfs(VLink G, int vIndex, int *visited);
+
+#include <tree.h>
+// 最小生成树
+TREE min_span_prim(VLink G, int n);
+
+TREE min_span_kruskal(VLink G, int n);
 
 
 

@@ -33,11 +33,12 @@ int main() {
 //            2
 //    };
 
-    VLink G = (VLink) malloc(sizeof(VNode) * 3);
-    adj_list(G, 3, 3);
-    G[0];
-    G[1];
-    G[2];
+    struct _node {
+        int key;
+        int degree;
+        struct _node *child[100];
+    };
+    printf("%llu", sizeof(struct _node *));
     return 0;
 }
 
