@@ -74,6 +74,12 @@ STree delete_st_recur(STree T, int key) {
 }
 
 // 伸展包含6种操作，目的是把访问结点移动到根结点
+// 1.zig
+// 2.zag
+// 3.zig-zig
+// 4.zag-zag
+// 5.zig-zag
+// 6.zag-zig
 STree _splay(STree T, int key) {
     if (T == NULL || key == T->key) {
         return T;
