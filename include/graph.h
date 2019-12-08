@@ -7,8 +7,11 @@
 
 // 邻接表
 typedef struct _edge {
+    // 弧头结点的位置
     int adjvex;
+    // 边权重
     int weight;
+    // 弧尾结点的下一条出边
     struct _edge *next;
 } ENode, *ELink;
 
@@ -16,6 +19,25 @@ typedef struct _vertex {
     int key;
     ELink link;
 } VNode, *VLink;
+
+
+/*
+ * 逆邻接表
+*/
+typedef struct _r_edge {
+    // 弧尾结点的位置
+    int adjvex;
+    // 边权重
+    int weight;
+    // 弧头结点的下一条入边
+    struct _r_edge *next;
+} RENode, *RELink;
+
+typedef struct _r_vertex {
+    int key;
+    RELink link;
+} RVNode, *RVLink;
+
 
 /*
  * 十字邻接表和多重邻接表的本质是合并邻接表和逆邻接表，即将边两个顶点的信息都放入边结点
@@ -80,11 +102,11 @@ void travel_bfs(VLink G, int n);
 void _bfs(VLink G, int vIndex, int *visited);
 
 #include <tree.h>
+
 // 最小生成树
 TREE min_span_prim(VLink G, int n);
 
 TREE min_span_kruskal(VLink G, int n);
-
 
 
 #endif //BASETEST_GRAPH_H
